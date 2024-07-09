@@ -1,4 +1,4 @@
-package com.xg7plugins.xg7menus.api.event;
+package com.xg7plugins.xg7menus.api.events;
 
 public enum MenuClickType {
     LEFT,

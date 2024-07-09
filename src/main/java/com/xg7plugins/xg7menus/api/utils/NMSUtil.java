@@ -1,4 +1,4 @@
-package com.xg7plugins.xg7lobby.utils;
+package com.xg7plugins.xg7menus.api.utils;
 
 import lombok.Getter;
 import org.bukkit.Bukkit;

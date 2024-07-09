@@ -1,4 +1,4 @@
-package com.xg7plugins.xg7lobby.utils;
+package com.xg7plugins.xg7menus.api.utils;
 
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -80,8 +80,25 @@ public class Text {
         int textWidht = 0;
         boolean cCode = false;
         boolean isBold = false;
+        boolean isrgb = false;
+        int rgbCount = 0;
         int cCodeCount = 0;
+        int rgbToAdd = 0;
         for (char c : text.toCharArray()) {
+            if (isrgb) {
+                if (rgbCount == 6) {
+                    isrgb = false;
+                    continue;
+                }
+                if ("0123456789aAbBcCdDeEfF".contains(String.valueOf(c))) {
+                    rgbToAdd = getCharSize(c, isBold);
+                    rgbCount++;
+                    continue;
+                }
+                rgbCount = 0;
+                textWidht += rgbToAdd;
+                continue;
+            }
             if (c == '&') {
                 cCode = true;
                 cCodeCount++;
@@ -94,11 +111,15 @@ public class Text {
                 continue;
             }
             if (cCode) {
+                if (c == '#') {
+                    cCode = false;
+                    isrgb = true;
+                    continue;
+                }
                 while (cCodeCount != 0) {
                     cCodeCount--;
                     textWidht += getCharSize('&', isBold);
                 }
-                continue;
             }
             textWidht += getCharSize(c, isBold);
         }

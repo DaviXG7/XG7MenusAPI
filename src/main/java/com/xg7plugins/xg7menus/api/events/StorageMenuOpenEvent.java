@@ -1,19 +1,18 @@
 package com.xg7plugins.xg7menus.api.events;
 
-import com.xg7plugins.xg7menus.api.menus.Menu;
-import com.xg7plugins.xg7menus.api.menus.StorageMenu;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.PlayerEvent;
+import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 
-public class StorageMenuCloseEvent extends PlayerEvent {
+public class StorageMenuOpenEvent extends PlayerEvent {
     private static final HandlerList handlers = new HandlerList();
-    private StorageMenu menu;
+    private Inventory inventory;
 
-    public StorageMenuCloseEvent(StorageMenu menu, Player player) {
+    public StorageMenuOpenEvent(Inventory inventory, Player player) {
         super(player);
-        this.menu = menu;
+        this.inventory = inventory;
     }
 
     @Override

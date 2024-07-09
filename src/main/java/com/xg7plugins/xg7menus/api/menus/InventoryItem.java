@@ -1,10 +1,12 @@
-package com.xg7plugins.xg7menus.api.menus.supers;
+package com.xg7plugins.xg7menus.api.menus;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.xg7plugins.xg7menus.api.utils.Log;
 import com.xg7plugins.xg7menus.api.utils.Text;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -26,7 +28,8 @@ import java.util.stream.Collectors;
 @Getter
 public class InventoryItem {
 
-    private ItemStack itemStack;
+    private final ItemStack itemStack;
+    @Setter(AccessLevel.PROTECTED)
     private int slot;
 
     public InventoryItem(Material material, String name, List<String> lore, int amount, int slot) {
@@ -53,6 +56,10 @@ public class InventoryItem {
         itemStack.setItemMeta(meta);
 
         this.itemStack = itemStack;
+        this.slot = slot;
+    }
+    public InventoryItem(ItemStack stack, int slot) {
+        this.itemStack = stack;
         this.slot = slot;
     }
 
@@ -147,6 +154,19 @@ public class InventoryItem {
             }
             return this;
         }
+    }
+
+    public static InventoryItem fromString(String s) {
+        JSONObject object = new JSONObject(s);
+        return new InventoryItem(ItemStack.deserialize((Map<String, Object>) object.get("item")), object.getInt("slot"));
+    }
+
+    @Override
+    public String toString() {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("slot", slot);
+        jsonObject.put("item", itemStack.serialize());
+        return jsonObject.toString();
     }
 
 

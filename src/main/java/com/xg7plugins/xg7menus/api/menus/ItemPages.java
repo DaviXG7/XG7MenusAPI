@@ -6,7 +6,7 @@ import org.bukkit.entity.Player;
 import java.util.List;
 
 @Getter
-public class ItemsPage extends Menu {
+public class ItemPages extends Menu {
 
     private List<InventoryItem> pageItems;
     private int pageindex;
@@ -14,7 +14,7 @@ public class ItemsPage extends Menu {
     private InventoryCoordinate coordinate2;
 
 
-    public ItemsPage(String id, String title, int size, List<InventoryItem> items, InventoryCoordinate inicialItemPos, InventoryCoordinate finalItemPos) {
+    public ItemPages(String id, String title, int size, List<InventoryItem> items, InventoryCoordinate inicialItemPos, InventoryCoordinate finalItemPos) {
         super(id, title, size);
         this.pageItems = items;
         this.coordinate1 = inicialItemPos;
