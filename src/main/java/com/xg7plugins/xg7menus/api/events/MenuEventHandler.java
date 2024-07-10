@@ -3,11 +3,14 @@ package com.xg7plugins.xg7menus.api.events;
 import com.xg7plugins.xg7menus.api.manager.MenuManager;
 import com.xg7plugins.xg7menus.api.manager.StorageMenuManager;
 import com.xg7plugins.xg7menus.api.menus.Menu;
+import com.xg7plugins.xg7menus.api.menus.PlayerMenu;
 import com.xg7plugins.xg7menus.api.menus.StorageMenu;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
@@ -25,13 +28,30 @@ public class MenuEventHandler implements Listener {
 
     }
     @EventHandler
-    public void onInteract(PlayerInteractEvent event) {
+    public void onInteractEvent(PlayerInteractEvent event) {
         Menu menu = MenuManager.getMenuByPlayer(event.getPlayer());
         if (menu == null) return;
 
-        Bukkit.getPluginManager().callEvent(new MenuClickEvent(menu, menu.getItemBySlot(event.getPlayer().getInventory().getHeldItemSlot()), MenuClickType.valueOf(event.getAction().name()), null, event.getPlayer().getInventory().getHeldItemSlot(), event.getPlayer()));
+        event.setCancelled(!((PlayerMenu)menu).isCanInteract());
+
+        Bukkit.getPluginManager().callEvent(new MenuClickEvent(menu, menu.getItemBySlot(event.getPlayer().getInventory().getHeldItemSlot()), MenuClickType.valueOf(event.getAction().name()), event.getClickedBlock() == null ? null : event.getClickedBlock().getLocation(), event.getPlayer().getInventory().getHeldItemSlot(), event.getPlayer()));
 
     }
+    @EventHandler
+    public void onBreakEvent(BlockBreakEvent event) {
+        Menu menu = MenuManager.getMenuByPlayer(event.getPlayer());
+        if (menu == null) return;
+
+        event.setCancelled(!((PlayerMenu)menu).isCanBreak());
+    }
+    @EventHandler
+    public void onPlaceEvent(BlockPlaceEvent event) {
+        Menu menu = MenuManager.getMenuByPlayer(event.getPlayer());
+        if (menu == null) return;
+
+        event.setCancelled(!((PlayerMenu)menu).isCanBuild());
+    }
+
     @EventHandler
     public void onMenuOpen(InventoryOpenEvent event) {
         Menu menu = MenuManager.getMenuByPlayer((Player) event.getPlayer());

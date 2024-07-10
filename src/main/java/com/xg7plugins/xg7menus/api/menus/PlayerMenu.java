@@ -1,6 +1,8 @@
 package com.xg7plugins.xg7menus.api.menus;
 
 import com.xg7plugins.xg7menus.api.manager.MenuManager;
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -12,6 +14,16 @@ import java.util.stream.IntStream;
 public class PlayerMenu extends Menu {
 
     private final Map<Integer, ItemStack> oldItems;
+
+    @Getter
+    @Setter
+    private boolean canInteract = false;
+    @Getter
+    @Setter
+    private boolean canBreak = false;
+    @Getter
+    @Setter
+    private boolean canBuild = false;
 
     public PlayerMenu(String id) {
         super(id, "", 0);
