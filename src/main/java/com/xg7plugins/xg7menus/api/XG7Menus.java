@@ -18,7 +18,7 @@ public class XG7Menus {
     public static void inicialize(JavaPlugin javaPlugin) {
         plugin = javaPlugin;
         plugin.getServer().getPluginManager().registerEvents(new MenuEventHandler(), plugin);
-        Bukkit.getConsoleSender().sendMessage(plugin.getName() + " is using XG7MenusAPI.");
+        Bukkit.getConsoleSender().sendMessage("[" + plugin.getName() + "] is using XG7MenusAPI.");
         Bukkit.getConsoleSender().sendMessage("It's a free api, visit our website https://xg7plugins.com");
     }
 }

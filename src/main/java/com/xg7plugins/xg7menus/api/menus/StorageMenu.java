@@ -4,18 +4,17 @@ import com.google.gson.*;
 
 import com.xg7plugins.xg7menus.api.manager.StorageMenuManager;
 
-import com.xg7plugins.xg7menus.api.utils.NMSUtil;
+import com.xg7plugins.xg7menus.api.utils.Log;
 import lombok.AllArgsConstructor;
 
 import lombok.SneakyThrows;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
-import java.lang.reflect.Method;
 import java.util.*;
 
 @AllArgsConstructor
@@ -44,8 +43,6 @@ public class StorageMenu {
 
     @SneakyThrows
     public static StorageMenu fromString(String json) {
-        Gson gson = new Gson();
-
         Map<Integer, ItemStack> items = new HashMap<>();
 
         JsonArray jsonArray = new JsonParser().parse(json).getAsJsonArray();
@@ -53,12 +50,14 @@ public class StorageMenu {
         for (JsonElement element : jsonArray) {
             JsonObject jsonObject = element.getAsJsonObject();
 
-            JsonObject itemObject = jsonObject.getAsJsonObject("item");
+            String item64 = jsonObject.get("item").getAsString();
             int slot = jsonObject.get("slot").getAsInt();
 
-            Map<String, Object> itemMap = gson.fromJson(itemObject, Map.class);
+            String yaml = new String(Base64.getDecoder().decode(item64));
+            YamlConfiguration config = new YamlConfiguration();
+            config.loadFromString(yaml);
 
-            items.put(slot, ItemStack.deserialize(itemMap));
+            items.put(slot, config.getItemStack("item"));
         }
         return new StorageMenu(items);
     }
@@ -68,16 +67,18 @@ public class StorageMenu {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         List<Map<String, Object>> inventoryItems = new ArrayList<>();
         for (Map.Entry<Integer, ItemStack> stackEntry : items.entrySet()) {
-
-            Map<String, Object> item = stackEntry.getValue().serialize();
-            item.put("meta", stackEntry.getValue().getItemMeta().serialize());
-
             Map<String, Object> inventoryItem = new HashMap<>();
-            inventoryItem.put("item", item);
+
+            YamlConfiguration config = new YamlConfiguration();
+            config.set("item", stackEntry.getValue());
+            String yaml = config.saveToString();
+
+            inventoryItem.put("item", Base64.getEncoder().encodeToString(yaml.getBytes()));
             inventoryItem.put("slot", stackEntry.getKey());
 
             inventoryItems.add(inventoryItem);
         }
+        Log.info("This is the json of the items: " + gson.toJson(inventoryItems));
         return gson.toJson(inventoryItems);
     }
 

@@ -12,6 +12,7 @@ import lombok.Setter;
 import lombok.SneakyThrows;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -161,37 +162,26 @@ public class InventoryItem {
 
     @SneakyThrows
     public static InventoryItem fromString(String json) {
-
-        Gson gson = new Gson();
-
-
         JsonObject object = new JsonParser().parse(json).getAsJsonObject();
-        JsonObject itemObject = object.getAsJsonObject("item");
-        JsonObject metaObject = object.getAsJsonObject("meta");
 
-        Map<String, Object> itemMap = gson.fromJson(itemObject, Map.class);
-        Map<String, Object> metamap = gson.fromJson(metaObject, Map.class);
+        String item64 = object.get("item").getAsString();
 
-        ItemStack stack = ItemStack.deserialize(itemMap);
-        Class<?> clazz = Class.forName("org.bukkit.craftbukkit." + NMSUtil.getVersion() +".inventory.CraftMetaItem.SerializableMeta");
-        Method deserialize = clazz.getMethod("deserialize", Map.class);
+        String yaml = new String(Base64.getDecoder().decode(item64));
+        YamlConfiguration config = new YamlConfiguration();
+        config.loadFromString(yaml);
 
-        ItemMeta meta = (ItemMeta) deserialize.invoke(null, metamap);
-
-        stack.setItemMeta(meta);
-
-        return new InventoryItem(stack, object.get("slot").getAsInt());
+        return new InventoryItem(config.getItemStack("item"), object.get("slot").getAsInt());
     }
 
     @Override
     public String toString() {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-
-        Map<String, Object> item = itemStack.serialize();
-        item.put("meta", itemStack.getItemMeta().serialize());
+        YamlConfiguration config = new YamlConfiguration();
+        config.set("item", itemStack);
+        String yaml = config.saveToString();
 
         Map<String, Object> inventoryItem = new HashMap<>();
-        inventoryItem.put("item", item);
+        inventoryItem.put("item", Base64.getEncoder().encodeToString(yaml.getBytes()));
         inventoryItem.put("slot", slot);
 
         return gson.toJson(inventoryItem);
