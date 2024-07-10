@@ -1,6 +1,7 @@
 package com.xg7plugins.xg7menus.api.menus;
 
 import com.xg7plugins.xg7menus.api.manager.MenuManager;
+import com.xg7plugins.xg7menus.api.utils.Log;
 import com.xg7plugins.xg7menus.api.utils.Text;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,7 +9,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class Menu {
@@ -26,10 +29,12 @@ public class Menu {
         this.id = id;
         this.title = title;
         this.size = size;
+        this.items = new ArrayList<>();
+        Log.fine("Menu with id " + id + " has been created");
     }
 
     public void addItems(InventoryItem... items) {
-        this.items = Arrays.asList(items);
+        Collections.addAll(this.items, items);
     }
     public void updateInventory(InventoryItem item) {
         inventory.setItem(item.getSlot(), item.getItemStack());
@@ -66,9 +71,13 @@ public class Menu {
             item.setPlaceholders(player);
             inventory.setItem(item.getSlot(), item.getItemStack());
         }
-        MenuManager.put(player, this);
         player.closeInventory();
+        MenuManager.put(player, this);
         player.openInventory(inventory);
+    }
+
+    public void close(Player player) {
+        player.closeInventory();
     }
 
     /**

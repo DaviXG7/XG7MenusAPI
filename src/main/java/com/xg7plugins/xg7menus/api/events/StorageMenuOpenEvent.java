@@ -1,11 +1,13 @@
 package com.xg7plugins.xg7menus.api.events;
 
+import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 
+@Getter
 public class StorageMenuOpenEvent extends PlayerEvent {
     private static final HandlerList handlers = new HandlerList();
     private Inventory inventory;

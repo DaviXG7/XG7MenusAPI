@@ -11,6 +11,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 
 public class MenuEventHandler implements Listener {
 
@@ -21,6 +22,14 @@ public class MenuEventHandler implements Listener {
         event.setCancelled(true);
 
         Bukkit.getPluginManager().callEvent(new MenuClickEvent(menu, menu.getItemBySlot(event.getRawSlot()), MenuClickType.valueOf(event.getClick().name()), null, event.getRawSlot(), (Player) event.getWhoClicked()));
+
+    }
+    @EventHandler
+    public void onInteract(PlayerInteractEvent event) {
+        Menu menu = MenuManager.getMenuByPlayer(event.getPlayer());
+        if (menu == null) return;
+
+        Bukkit.getPluginManager().callEvent(new MenuClickEvent(menu, menu.getItemBySlot(event.getPlayer().getInventory().getHeldItemSlot()), MenuClickType.valueOf(event.getAction().name()), null, event.getPlayer().getInventory().getHeldItemSlot(), event.getPlayer()));
 
     }
     @EventHandler

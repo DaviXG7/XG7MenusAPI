@@ -1,12 +1,15 @@
 package com.xg7plugins.xg7menus.api.menus;
 
+import com.google.gson.*;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.xg7plugins.xg7menus.api.utils.Log;
+import com.xg7plugins.xg7menus.api.utils.NMSUtil;
 import com.xg7plugins.xg7menus.api.utils.Text;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.SneakyThrows;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -15,11 +18,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.material.MaterialData;
-import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.*;
@@ -77,10 +80,10 @@ public class InventoryItem {
     public void setPlaceholders(Player player) {
         ItemMeta meta = this.itemStack.getItemMeta();
         meta.setDisplayName(Text.setPlaceholders(meta.getDisplayName(), player));
-        meta.setLore(meta.getLore().stream().map(l -> Text.setPlaceholders(l, player)).collect(Collectors.toList()));
+        if (meta.getLore() != null) meta.setLore(meta.getLore().stream().map(l -> Text.setPlaceholders(l, player)).collect(Collectors.toList()));
     }
 
-    static class SkullInventoryItem extends InventoryItem {
+    public static class SkullInventoryItem extends InventoryItem {
 
         public SkullInventoryItem(String name, List<String> lore, int amount, int slot) {
             super(Arrays.asList(Material.values()).stream().map(Material::name).collect(Collectors.toList()).contains("PLAYER_HEAD")
@@ -131,12 +134,12 @@ public class InventoryItem {
                 }
                 conn.disconnect();
 
-                JSONObject profileData = new JSONObject(sb.toString());
-                JSONObject properties = profileData.getJSONArray("properties").getJSONObject(0);
+                JsonObject profileData = new JsonParser().parse(sb.toString()).getAsJsonObject();
+                JsonObject properties = profileData.getAsJsonArray("properties").get(0).getAsJsonObject();
 
 
                 GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
-                gameProfile.getProperties().put("textures", new Property("textures", properties.getString("value")));
+                gameProfile.getProperties().put("textures", new Property("textures", properties.get("value").getAsString()));
 
                 SkullMeta skullMeta = (SkullMeta) super.getItemStack().getItemMeta();
 
@@ -156,17 +159,42 @@ public class InventoryItem {
         }
     }
 
-    public static InventoryItem fromString(String s) {
-        JSONObject object = new JSONObject(s);
-        return new InventoryItem(ItemStack.deserialize((Map<String, Object>) object.get("item")), object.getInt("slot"));
+    @SneakyThrows
+    public static InventoryItem fromString(String json) {
+
+        Gson gson = new Gson();
+
+
+        JsonObject object = new JsonParser().parse(json).getAsJsonObject();
+        JsonObject itemObject = object.getAsJsonObject("item");
+        JsonObject metaObject = object.getAsJsonObject("meta");
+
+        Map<String, Object> itemMap = gson.fromJson(itemObject, Map.class);
+        Map<String, Object> metamap = gson.fromJson(metaObject, Map.class);
+
+        ItemStack stack = ItemStack.deserialize(itemMap);
+        Class<?> clazz = Class.forName("org.bukkit.craftbukkit." + NMSUtil.getVersion() +".inventory.CraftMetaItem.SerializableMeta");
+        Method deserialize = clazz.getMethod("deserialize", Map.class);
+
+        ItemMeta meta = (ItemMeta) deserialize.invoke(null, metamap);
+
+        stack.setItemMeta(meta);
+
+        return new InventoryItem(stack, object.get("slot").getAsInt());
     }
 
     @Override
     public String toString() {
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("slot", slot);
-        jsonObject.put("item", itemStack.serialize());
-        return jsonObject.toString();
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+        Map<String, Object> item = itemStack.serialize();
+        item.put("meta", itemStack.getItemMeta().serialize());
+
+        Map<String, Object> inventoryItem = new HashMap<>();
+        inventoryItem.put("item", item);
+        inventoryItem.put("slot", slot);
+
+        return gson.toJson(inventoryItem);
     }
 
 

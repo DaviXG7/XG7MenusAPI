@@ -33,8 +33,10 @@ public class PlayerMenu extends Menu {
         }
 
     }
+    @Override
     public void close(Player player) {
         player.getInventory().clear();
+        MenuManager.remove(player);
         oldItems.entrySet().forEach(oldItem -> player.getInventory().setItem(oldItem.getKey(), oldItem.getValue()));
     }
 

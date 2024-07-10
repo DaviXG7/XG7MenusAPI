@@ -66,8 +66,9 @@ public class Text {
             text = applyGradients(text);
             Matcher matcher = HEX_PATTERN.matcher(text);
             while (matcher.find()) {
-                String color = text.substring(matcher.start(), matcher.end());
+                String color = text.substring(matcher.start() + 1, matcher.end());
                 text = text.replace(color, net.md_5.bungee.api.ChatColor.of(color) + "");
+                text = new StringBuilder(text).deleteCharAt(matcher.start()).toString();
             }
         }
 

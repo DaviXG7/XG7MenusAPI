@@ -1,7 +1,6 @@
 package com.xg7plugins.xg7menus.api;
 
 import com.xg7plugins.xg7menus.api.events.MenuEventHandler;
-import com.xg7plugins.xg7menus.api.menus.Menu;
 import com.xg7plugins.xg7menus.api.utils.Log;
 import lombok.Getter;
 import org.bukkit.Bukkit;

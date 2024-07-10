@@ -1,7 +1,9 @@
 package com.xg7plugins.xg7menus.api.menus;
 
 import lombok.Getter;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
@@ -26,9 +28,9 @@ public class ItemPages extends Menu {
 
         int index = 0;
         this.pageindex = 0;
-        for (int y = coordinate1.getY(); y < coordinate2.getY(); y++) {
-            if (pageItems.get(index) == null) break;
-            for (int x = coordinate1.getX(); x < coordinate2.getY(); x++) {
+        loop: for (int y = coordinate1.getY(); y <= coordinate2.getY(); y++) {
+            for (int x = coordinate1.getX(); x <= coordinate2.getX(); x++) {
+                if (index == pageItems.size()) break loop;
                 InventoryItem inventoryItem = pageItems.get(index);
                 inventoryItem.setSlot(InventoryCoordinate.toSlot(x,y));
                 addItems(inventoryItem);
@@ -47,18 +49,18 @@ public class ItemPages extends Menu {
 
         int index = altura * largura * pageindex;
 
-        if (pageItems.get(index) == null) return;
+        if (index >= pageItems.size()) return;
 
         List<InventoryItem> items = pageItems.subList(index, pageItems.size());
 
-
-        for (int y = coordinate1.getY(); y < coordinate2.getY(); y++) {
-            if (pageItems.get(index) == null) break;
-            for (int x = coordinate1.getX(); x < coordinate2.getY(); x++) {
+        loop: for (int y = coordinate1.getY(); y <= coordinate2.getY(); y++) {
+            for (int x = coordinate1.getX(); x <= coordinate2.getX(); x++) {
+                if (index == pageItems.size()) break loop;
                 InventoryItem inventoryItem = pageItems.get(index);
                 inventoryItem.setSlot(InventoryCoordinate.toSlot(x,y));
                 updateInventory(inventoryItem);
                 index++;
+
             }
         }
 
@@ -70,19 +72,20 @@ public class ItemPages extends Menu {
 
         int index = altura * largura * (pageindex + 1);
 
-        if (pageItems.get(index) == null) return;
+        if (index >= pageItems.size()) return;
         pageindex++;
 
         List<InventoryItem> items = pageItems.subList(index, pageItems.size());
 
 
-        for (int y = coordinate1.getY(); y < coordinate2.getY(); y++) {
-            if (pageItems.get(index) == null) break;
-            for (int x = coordinate1.getX(); x < coordinate2.getY(); x++) {
-                InventoryItem inventoryItem = pageItems.get(index);
+        loop: for (int y = coordinate1.getY(); y <= coordinate2.getY(); y++) {
+            for (int x = coordinate1.getX(); x <= coordinate2.getX(); x++) {
+                InventoryItem inventoryItem = new InventoryItem(new ItemStack(Material.AIR), -1);
+                if (index < pageItems.size()) inventoryItem = pageItems.get(index);
                 inventoryItem.setSlot(InventoryCoordinate.toSlot(x,y));
                 updateInventory(inventoryItem);
                 index++;
+
             }
         }
 
@@ -95,18 +98,19 @@ public class ItemPages extends Menu {
 
         int index = altura * largura * pageindex;
 
-        if (pageItems.get(index) == null) return;
+        if (index >= pageItems.size()) return;
 
         List<InventoryItem> items = pageItems.subList(index, pageItems.size());
 
 
-        for (int y = coordinate1.getY(); y < coordinate2.getY(); y++) {
-            if (pageItems.get(index) == null) break;
-            for (int x = coordinate1.getX(); x < coordinate2.getY(); x++) {
+        loop: for (int y = coordinate1.getY(); y <= coordinate2.getY(); y++) {
+            for (int x = coordinate1.getX(); x <= coordinate2.getX(); x++) {
+                if (index == pageItems.size()) break loop;
                 InventoryItem inventoryItem = pageItems.get(index);
                 inventoryItem.setSlot(InventoryCoordinate.toSlot(x,y));
                 updateInventory(inventoryItem);
                 index++;
+
             }
         }
 

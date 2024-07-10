@@ -2,12 +2,14 @@ package com.xg7plugins.xg7menus.api.events;
 
 import com.xg7plugins.xg7menus.api.menus.InventoryItem;
 import com.xg7plugins.xg7menus.api.menus.Menu;
+import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.PlayerEvent;
 import org.jetbrains.annotations.NotNull;
 
+@Getter
 public class MenuClickEvent extends PlayerEvent {
     private static final HandlerList handlers = new HandlerList();
 
