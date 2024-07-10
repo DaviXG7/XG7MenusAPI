@@ -110,12 +110,12 @@ public class InventoryItem {
         }
         public SkullInventoryItem setOwner(String owner, boolean onlineMode) {
             ((SkullMeta) super.getItemStack().getItemMeta()).setOwner(owner);
-            if (onlineMode) setPlayerSkinValue((Player) Bukkit.getOfflinePlayer(owner));
+            if (onlineMode) setPlayerSkinValue(Bukkit.getOfflinePlayer(owner).getUniqueId());
             return this;
         }
-        public SkullInventoryItem setPlayerSkinValue(Player player) {
+        public SkullInventoryItem setPlayerSkinValue(UUID player) {
             try {
-                URL url = new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + player.getUniqueId());
+                URL url = new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + player);
 
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("GET");
