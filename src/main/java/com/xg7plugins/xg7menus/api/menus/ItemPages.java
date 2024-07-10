@@ -14,6 +14,7 @@ public class ItemPages extends Menu {
     private int pageindex;
     private InventoryCoordinate coordinate1;
     private InventoryCoordinate coordinate2;
+    private final int area;
 
 
     public ItemPages(String id, String title, int size, List<InventoryItem> items, InventoryCoordinate inicialItemPos, InventoryCoordinate finalItemPos) {
@@ -21,6 +22,7 @@ public class ItemPages extends Menu {
         this.pageItems = items;
         this.coordinate1 = inicialItemPos;
         this.coordinate2 = finalItemPos;
+        this.area = (coordinate2.getY() - coordinate1.getY() + 1) * (coordinate2.getX() - coordinate1.getX() + 1);
     }
 
     @Override
@@ -28,7 +30,8 @@ public class ItemPages extends Menu {
 
         int index = 0;
         this.pageindex = 0;
-        loop: for (int y = coordinate1.getY(); y <= coordinate2.getY(); y++) {
+        loop:
+        for (int y = coordinate1.getY(); y <= coordinate2.getY(); y++) {
             for (int x = coordinate1.getX(); x <= coordinate2.getX(); x++) {
                 if (index == pageItems.size()) break loop;
                 InventoryItem inventoryItem = pageItems.get(index);
@@ -44,16 +47,14 @@ public class ItemPages extends Menu {
     public void goPage(int pageindex) {
         this.pageindex = pageindex;
 
-        int altura = coordinate2.getY() - coordinate1.getY() + 1;
-        int largura = coordinate2.getX() - coordinate1.getX() + 1;
-
-        int index = altura * largura * pageindex;
+        int index = area * pageindex;
 
         if (index >= pageItems.size()) return;
 
         List<InventoryItem> items = pageItems.subList(index, pageItems.size());
 
-        loop: for (int y = coordinate1.getY(); y <= coordinate2.getY(); y++) {
+        loop:
+        for (int y = coordinate1.getY(); y <= coordinate2.getY(); y++) {
             for (int x = coordinate1.getX(); x <= coordinate2.getX(); x++) {
                 if (index == pageItems.size()) break loop;
                 InventoryItem inventoryItem = pageItems.get(index);
@@ -67,10 +68,8 @@ public class ItemPages extends Menu {
     }
 
     public void nextPage() {
-        int altura = coordinate2.getY() - coordinate1.getY() + 1;
-        int largura = coordinate2.getX() - coordinate1.getX() + 1;
 
-        int index = altura * largura * (pageindex + 1);
+        int index = area * (pageindex + 1);
 
         if (index >= pageItems.size()) return;
         pageindex++;
@@ -78,7 +77,8 @@ public class ItemPages extends Menu {
         List<InventoryItem> items = pageItems.subList(index, pageItems.size());
 
 
-        loop: for (int y = coordinate1.getY(); y <= coordinate2.getY(); y++) {
+        loop:
+        for (int y = coordinate1.getY(); y <= coordinate2.getY(); y++) {
             for (int x = coordinate1.getX(); x <= coordinate2.getX(); x++) {
                 InventoryItem inventoryItem = new InventoryItem(new ItemStack(Material.AIR), -1);
                 if (index < pageItems.size()) inventoryItem = pageItems.get(index);
@@ -93,17 +93,15 @@ public class ItemPages extends Menu {
     public void previusPage() {
         if (pageindex -1 < 0) return;
         pageindex--;
-        int altura = coordinate2.getY() - coordinate1.getY() + 1;
-        int largura = coordinate2.getX() - coordinate1.getX() + 1;
 
-        int index = altura * largura * pageindex;
+        int index = area * pageindex;
 
         if (index >= pageItems.size()) return;
 
         List<InventoryItem> items = pageItems.subList(index, pageItems.size());
 
-
-        loop: for (int y = coordinate1.getY(); y <= coordinate2.getY(); y++) {
+        loop:
+        for (int y = coordinate1.getY(); y <= coordinate2.getY(); y++) {
             for (int x = coordinate1.getX(); x <= coordinate2.getX(); x++) {
                 if (index == pageItems.size()) break loop;
                 InventoryItem inventoryItem = pageItems.get(index);
