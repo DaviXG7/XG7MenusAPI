@@ -25,8 +25,12 @@ To start using XG7Menus in your Spigot plugin, follow these steps:
   <version>BETA-1.0</version>
 </dependency>
 ```
-
-2. **Create a Menu**:
+2. **Include it in your main file**:
+```java
+//This will inicialize the XG7Menus
+XG7Menus.inicialize(this);
+```
+3. **Create a Menu**:
    - Define menu layouts using intuitive methods provided by XG7Menus.
    - Populate menus with items using simple item management APIs.
 
