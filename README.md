@@ -82,7 +82,7 @@ MenuPages pages = new MenuPages(menu1, menu2, ...);
 //Create a list of item pages
 ItemPages itemPages = new ItemPages("id", "title", /* size */27, items, new Menu.InventoryCoordinate(0,0), new Menu.InventoryCoordinate(9,5));
 //Create a StorageMenu to Storage items in a json or database
-StorageMenu storageMenu = new StorageMenu(/* Inicializes with empty inventory or a map with items or a inventory */);
+StorageMenu storageMenu = new StorageMenu(/* Inicializes with empty inventory or a map with items or an inventory */);
 ```
 Visit our [website](https://xg7plugins.com) for more.
 
