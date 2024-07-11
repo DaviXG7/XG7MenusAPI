@@ -1,4 +1,4 @@
-Sorry if i write wrong, my main language is not english. I used translator in some parts.
+Sorry if i writed wrong, my main language is not english. I used translator in some parts.
 
 ### XG7Menus API Documentation
 
@@ -33,7 +33,33 @@ XG7Menus.inicialize(this);
 3. **Create a Menu**:
    - Define menu layouts using intuitive methods provided by XG7Menus.
    - Populate menus with items using simple item management APIs.
-
+4. **Handle the menu with click event**:
+   - XG7Menus has a custom click event, here is an example:
+```java
+@EventHandler
+public void onClick(MenuClickEvent event) {
+   if (!event.getMenu().getId().equals("youid")) return;
+   if (event.getSlot() == 0) {
+      event.getMenu().updateInventory(
+         new InventoryItem(
+         Material.DIAMOND,
+         "Changed item on slot 0",
+         new ArrayList<>(),
+         1, 
+         //Will change the item with this slot
+         0
+         )
+      );
+      //Other methods
+      event.getPlayer();
+      //If menu is a PlayerMenu
+      event.getLocation();
+      event.getInventoryItem();
+      //Menu click type
+      event.getType();
+   }
+}
+```
 #### Example Usage
 ```java
 //Create the menu
@@ -58,6 +84,6 @@ ItemPages itemPages = new ItemPages("id", "title", /* size */27, items, new Menu
 //Create a StorageMenu to Storage items in a json or database
 StorageMenu storageMenu = new StorageMenu(/* Inicializes with empty inventory or a map with items or a inventory */);
 ```
-Support: Visit our [website](https://xg7plugins.com) for more.
+Visit our [website](https://xg7plugins.com) for more.
 
 Thank you for choosing XG7Menus. Start creating engaging menus for your Spigot server today!
