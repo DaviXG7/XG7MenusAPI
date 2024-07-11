@@ -6,8 +6,17 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+
+/**
+ * MenuPages is a simple way to create paginated menus. <br>
+ * You can create as many menus as you want and open <br>
+ * them using their IDs
+ */
 public class MenuPages {
 
+    /**
+     * The menus with ids
+     */
     private final Map<String, Menu> menus = new HashMap<>();
 
     public MenuPages(Menu... pages) {

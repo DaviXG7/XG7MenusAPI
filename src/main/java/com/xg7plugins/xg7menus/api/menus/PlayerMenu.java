@@ -11,25 +11,43 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.IntStream;
 
+/**
+ * PlayerMenu is a menu where click actions <br>
+ * will be performed in the player's inventory, <br>
+ * both in the hotbar and within their inventory. <br>
+ * It is specially designed for lobby menus, <br>
+ * menus for placing a region, editing something, etc.
+ *
+ * @see Menu
+ */
+@Getter
 public class PlayerMenu extends Menu {
 
-    private final Map<Integer, ItemStack> oldItems;
+    /**
+     * These are the items stored before <br>
+     * the inventory was opened, and you can retrieve them.
+     */
+    private final Map<Integer, ItemStack> oldItems = new HashMap<>();
 
-    @Getter
+    /**
+     * These values cancel the events related to their names.
+     */
     @Setter
     private boolean canInteract = false;
-    @Getter
     @Setter
     private boolean canBreak = false;
-    @Getter
     @Setter
     private boolean canBuild = false;
 
     public PlayerMenu(String id) {
         super(id, "", 0);
-        oldItems = new HashMap<>();
     }
 
+    /**
+     * Gives the menu items to the player <br>
+     * and start the interaction
+     * @param player Player who will receive the items.
+     */
     @Override
     public void open(Player player) {
 
@@ -45,6 +63,11 @@ public class PlayerMenu extends Menu {
         }
 
     }
+
+    /**
+     * Closes the menu and give back the items
+     * @param player Player who will close the inventory
+     */
     @Override
     public void close(Player player) {
         player.getInventory().clear();

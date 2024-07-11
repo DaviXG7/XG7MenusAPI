@@ -9,6 +9,9 @@ import java.util.UUID;
 
 public class MenuManager {
 
+    /**
+     * The inventories that are open by a player
+     */
     private static final HashMap<UUID, Menu> activeInventories = new HashMap<>();
 
     public static void put(Player player, Menu menu) {

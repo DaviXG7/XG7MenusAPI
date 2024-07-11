@@ -5,6 +5,9 @@ import org.bukkit.Bukkit;
 
 import java.util.logging.Level;
 
+/**
+ * This class is used to debug
+ */
 public class Log {
 
     @Setter

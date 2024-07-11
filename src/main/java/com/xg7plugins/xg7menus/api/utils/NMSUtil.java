@@ -3,6 +3,9 @@ package com.xg7plugins.xg7menus.api.utils;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 
+/**
+ * This class is used to get NMS and CraftBukkit classes
+ */
 public class NMSUtil {
     static String packageName = Bukkit.getServer().getClass().getPackage().getName();
     @Getter

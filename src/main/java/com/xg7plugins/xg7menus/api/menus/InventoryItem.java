@@ -4,7 +4,6 @@ import com.google.gson.*;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.xg7plugins.xg7menus.api.utils.Log;
-import com.xg7plugins.xg7menus.api.utils.NMSUtil;
 import com.xg7plugins.xg7menus.api.utils.Text;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -23,12 +22,16 @@ import org.bukkit.material.MaterialData;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * InventoryItem is a simple ItemStack builder <br>
+ * where you can modify the itemStack's meta in<br>
+ * a much easier way and place it in the menu effortlessly.
+ */
 @Getter
 public class InventoryItem {
 
@@ -49,6 +52,10 @@ public class InventoryItem {
         this.itemStack = itemStack;
         this.slot = slot;
     }
+
+    /**
+     * @param material If you are using older versions, you can use materialData to make an item
+     */
     public InventoryItem(MaterialData material, String name, List<String> lore, int amount, int slot) {
 
         ItemStack itemStack = material.toItemStack(amount);
@@ -67,23 +74,51 @@ public class InventoryItem {
         this.slot = slot;
     }
 
+    /**
+     * This method adds an Enchantment to the itemStack
+     * @param enchant The enchantment that will be added to the item
+     * @param level the level of the enchantment
+     * @return This InventoryItem
+     */
     public InventoryItem addEnchant(Enchantment enchant, int level) {
         this.itemStack.addUnsafeEnchantment(enchant, level);
         return this;
     }
+    /**
+     * This method adds a List of enchantments to the itemStack
+     * @param enchants The map of the enchantment
+     * @return This InventoryItem
+     */
     public InventoryItem addEnchants(Map<Enchantment, Integer> enchants) {
         this.itemStack.addUnsafeEnchantments(enchants);
         return this;
     }
+
+    /**
+     * This method sets a ItemMeta to the itemStack <br>
+     * (You can make a custom meta)
+     * @param meta The itemMeta that will be set on item
+     */
     public void setMeta(ItemMeta meta) {
         this.itemStack.setItemMeta(meta);
     }
+
+    /**
+     * If you have the plugin PlaceHolderAPI, this method <br>
+     * will replace all placeholders
+     * @param player The player of teh placeholder
+     */
     public void setPlaceholders(Player player) {
         ItemMeta meta = this.itemStack.getItemMeta();
         meta.setDisplayName(Text.setPlaceholders(meta.getDisplayName(), player));
         if (meta.getLore() != null) meta.setLore(meta.getLore().stream().map(l -> Text.setPlaceholders(l, player)).collect(Collectors.toList()));
+        setMeta(meta);
     }
 
+    /**
+     * The SkullInventoryItem is an InventoryItem <br>
+     * where you can make a custom skull.
+     */
     public static class SkullInventoryItem extends InventoryItem {
 
         public SkullInventoryItem(String name, List<String> lore, int amount, int slot) {
@@ -92,6 +127,11 @@ public class InventoryItem {
                     name, lore, amount, slot);
         }
 
+        /**
+         * This method sets the skull skin value
+         * @param value The skin value of the skull
+         * @return This InventoryItem
+         */
         public SkullInventoryItem setValue(String value) {
             GameProfile gameProfile = new GameProfile(UUID.randomUUID(), "null");
             gameProfile.getProperties().put("textures", new Property("textures", value));
@@ -109,11 +149,23 @@ public class InventoryItem {
             super.setMeta(skullMeta);
             return this;
         }
+        /**
+         * This method sets the skull owner
+         * @param owner The skin owner of the skull
+         * @param onlineMode If the server is in online mode, it will be possible to set the player's skin.
+         * @return This InventoryItem
+         */
         public SkullInventoryItem setOwner(String owner, boolean onlineMode) {
             ((SkullMeta) super.getItemStack().getItemMeta()).setOwner(owner);
             if (onlineMode) setPlayerSkinValue(Bukkit.getOfflinePlayer(owner).getUniqueId());
             return this;
         }
+
+        /**
+         * This method sets the skull skin value with the player skin value
+         * @param player The player that will be used to get the skin value
+         * @return This InventoryItem
+         */
         public SkullInventoryItem setPlayerSkinValue(UUID player) {
             try {
                 URL url = new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + player);
@@ -160,6 +212,11 @@ public class InventoryItem {
         }
     }
 
+    /**
+     * Convert a JSON string to a InventoryItem
+     * @param json The JSON that will be converted
+     * @return A new InventoryItem with the json's information
+     */
     @SneakyThrows
     public static InventoryItem fromString(String json) {
         JsonObject object = new JsonParser().parse(json).getAsJsonObject();
@@ -173,6 +230,10 @@ public class InventoryItem {
         return new InventoryItem(config.getItemStack("item"), object.get("slot").getAsInt());
     }
 
+    /**
+     * Convert the InventoryItem to a JSON
+     * @return The InventoryItem converted to a JSON
+     */
     @Override
     public String toString() {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();

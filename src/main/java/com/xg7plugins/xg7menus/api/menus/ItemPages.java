@@ -7,6 +7,13 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
+/**
+ * ItemsPage is a paginated system based on items,<br>
+ * where the list of items you selected will appear. <br>
+ * You will choose where these items will be displayed, <br>
+ * and the layout of the Menu will be of your choice,<br>
+ * as you must create a base menu first.
+ */
 @Getter
 public class ItemPages extends Menu {
 
@@ -16,7 +23,15 @@ public class ItemPages extends Menu {
     private InventoryCoordinate coordinate2;
     private final int area;
 
-
+    /**
+     * Constructor of the ItemPages
+     * @param id
+     * @param title
+     * @param size
+     * @param items
+     * @param inicialItemPos
+     * @param finalItemPos
+     */
     public ItemPages(String id, String title, int size, List<InventoryItem> items, InventoryCoordinate inicialItemPos, InventoryCoordinate finalItemPos) {
         super(id, title, size);
         this.pageItems = items;

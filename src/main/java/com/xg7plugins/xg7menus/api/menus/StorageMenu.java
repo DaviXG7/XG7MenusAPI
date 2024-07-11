@@ -17,9 +17,19 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 
+/**
+ * StorageMenu is a menu used like a <br>
+ * digital chest, where you can place <br>
+ * items in this inventory and store <br>
+ * them as you wish.
+ * @see Menu Menu <br>
+ */
 @AllArgsConstructor
 public class StorageMenu {
 
+    /**
+     * Items that will be stored
+     */
     private Map<Integer, ItemStack> items;
 
     public StorageMenu(Inventory inventory) {
@@ -33,6 +43,12 @@ public class StorageMenu {
         this.items = new HashMap<>();
     }
 
+    /**
+     * Will open an Inventory to store item
+     * @param player Owner of the inventory
+     * @param title Title of the inventory
+     * @param size Size of the inventory
+     */
     public void open(Player player, String title, int size) {
         StorageMenuManager.add(player);
         Inventory inventory = Bukkit.createInventory(player, size, title);
@@ -41,6 +57,11 @@ public class StorageMenu {
         player.openInventory(inventory);
     }
 
+    /**
+     * Convert a JSON string to a StorageMenu
+     * @param json The JSON that will be converted
+     * @return A new StorageMenu with the json's information
+     */
     @SneakyThrows
     public static StorageMenu fromString(String json) {
         Map<Integer, ItemStack> items = new HashMap<>();
@@ -62,6 +83,10 @@ public class StorageMenu {
         return new StorageMenu(items);
     }
 
+    /**
+     * Convert the StorageMenu to a JSON
+     * @return The StorageMenu converted to a JSON
+     */
     @Override
     public String toString() {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
