@@ -38,7 +38,7 @@ XG7Menus.inicialize(this);
 ```java
 @EventHandler
 public void onClick(MenuClickEvent event) {
-   if (!event.getMenu().getId().equals("youid")) return;
+   if (!event.getMenu().getId().equals("yourid")) return;
    if (event.getSlot() == 0) {
       event.getMenu().updateInventory(
          new InventoryItem(
