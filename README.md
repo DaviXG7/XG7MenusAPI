@@ -22,7 +22,7 @@ To start using XG7Menus in your Spigot plugin, follow these steps:
 <dependency>
   <groupId>com.github.DaviXG7</groupId>
   <artifactId>XG7MenusAPI</artifactId>
-  <version>BETA-1.0</version>
+  <version>BETA-1.0.0</version>
 </dependency>
 ```
 2. **Include it in your main file**:
