@@ -84,6 +84,11 @@ ItemPages itemPages = new ItemPages("id", "title", /* size */27, items, new Menu
 //Create a StorageMenu to Storage items in a json or database
 StorageMenu storageMenu = new StorageMenu(/* Inicializes with empty inventory or a map with items or an inventory */);
 ```
+
+#### InventoryCoordinate Showcase
+
+![Inventory Coordinate]([https://exemplo.com/imagem.jpg](https://cdn.discordapp.com/attachments/1215382266218549258/1262796922121359541/InventoryCoordinate.png?ex=6697e6c7&is=66969547&hm=4f2d0fdfbc7d0f944603920a751d5f487f2baa80ee6a7d643646ba050fa6119f&))
+
 Visit our [website](https://xg7plugins.com) for more.
 
 Thank you for choosing XG7Menus. Start creating engaging menus for your Spigot server today!
