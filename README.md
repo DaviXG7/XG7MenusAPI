@@ -87,7 +87,7 @@ StorageMenu storageMenu = new StorageMenu(/* Inicializes with empty inventory or
 
 #### InventoryCoordinate Showcase
 
-![Inventory Coordinate]([https://exemplo.com/imagem.jpg](https://cdn.discordapp.com/attachments/1215382266218549258/1262796922121359541/InventoryCoordinate.png?ex=6697e6c7&is=66969547&hm=4f2d0fdfbc7d0f944603920a751d5f487f2baa80ee6a7d643646ba050fa6119f&))
+![Inventory Coordinate](https://cdn.discordapp.com/attachments/1215382266218549258/1262796922121359541/InventoryCoordinate.png?ex=6697e6c7&amp;is=66969547&amp;hm=4f2d0fdfbc7d0f944603920a751d5f487f2baa80ee6a7d643646ba050fa6119f&amp;)
 
 Visit our [website](https://xg7plugins.com) for more.
 
