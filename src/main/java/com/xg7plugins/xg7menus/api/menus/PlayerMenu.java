@@ -53,7 +53,7 @@ public class PlayerMenu extends Menu {
 
         IntStream.range(0, player.getInventory().getSize()).filter(i -> player.getInventory().getItem(i) != null && player.getInventory().getItem(i).getType() != Material.AIR).forEach(i -> oldItems.put(i, player.getInventory().getItem(i)));
 
-        MenuManager.put(player, this);
+        MenuManager.putPlayerMenu(player, this);
 
         player.getInventory().clear();
 
@@ -62,6 +62,7 @@ public class PlayerMenu extends Menu {
             player.getInventory().setItem(item.getSlot(), item.getItemStack());
         }
 
+        this.inventory = player.getInventory();
     }
 
     /**
@@ -71,7 +72,7 @@ public class PlayerMenu extends Menu {
     @Override
     public void close(Player player) {
         player.getInventory().clear();
-        MenuManager.remove(player);
+        MenuManager.removePlayerMenu(player);
         oldItems.entrySet().forEach(oldItem -> player.getInventory().setItem(oldItem.getKey(), oldItem.getValue()));
     }
 

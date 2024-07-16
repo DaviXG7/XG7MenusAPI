@@ -28,7 +28,8 @@ public class Menu {
     private String id;
     @Getter
     private List<InventoryItem> items;
-    private Inventory inventory;
+    @Getter
+    protected Inventory inventory;
     @Setter
     private InventoryItem fillItem = null;
 

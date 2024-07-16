@@ -15,41 +15,49 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 public class MenuEventHandler implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         Menu menu = MenuManager.getMenuByPlayer((Player) event.getWhoClicked());
-        if (menu == null) return;
+
+        if (menu == null) {
+            menu = MenuManager.getPlayerMenuByPlayer((Player) event.getWhoClicked());
+            if (menu == null) return;
+        }
+        if (!(menu instanceof PlayerMenu) && event.getRawSlot() > menu.getInventory().getSize() - 1) {
+            menu = MenuManager.getPlayerMenuByPlayer((Player) event.getWhoClicked());
+        }
         event.setCancelled(true);
 
-        Bukkit.getPluginManager().callEvent(new MenuClickEvent(menu, menu.getItemBySlot(event.getRawSlot()), MenuClickType.valueOf(event.getClick().name()), null, event.getRawSlot(), (Player) event.getWhoClicked()));
+        Bukkit.getPluginManager().callEvent(new MenuClickEvent(menu, menu.getItemBySlot(event.getSlot()), MenuClickType.valueOf(event.getClick().name()), null, event.getSlot(), (Player) event.getWhoClicked()));
 
     }
     @EventHandler
     public void onInteractEvent(PlayerInteractEvent event) {
-        Menu menu = MenuManager.getMenuByPlayer(event.getPlayer());
+        PlayerMenu menu = MenuManager.getPlayerMenuByPlayer(event.getPlayer());
         if (menu == null) return;
 
-        event.setCancelled(!((PlayerMenu)menu).isCanInteract());
+        event.setCancelled(!menu.isCanInteract());
 
         Bukkit.getPluginManager().callEvent(new MenuClickEvent(menu, menu.getItemBySlot(event.getPlayer().getInventory().getHeldItemSlot()), MenuClickType.valueOf(event.getAction().name()), event.getClickedBlock() == null ? null : event.getClickedBlock().getLocation(), event.getPlayer().getInventory().getHeldItemSlot(), event.getPlayer()));
 
     }
     @EventHandler
     public void onBreakEvent(BlockBreakEvent event) {
-        Menu menu = MenuManager.getMenuByPlayer(event.getPlayer());
+        PlayerMenu menu = MenuManager.getPlayerMenuByPlayer(event.getPlayer());
         if (menu == null) return;
 
-        event.setCancelled(!((PlayerMenu)menu).isCanBreak());
+        event.setCancelled(!menu.isCanBreak());
     }
     @EventHandler
     public void onPlaceEvent(BlockPlaceEvent event) {
-        Menu menu = MenuManager.getMenuByPlayer(event.getPlayer());
+        PlayerMenu menu = MenuManager.getPlayerMenuByPlayer(event.getPlayer());
         if (menu == null) return;
 
-        event.setCancelled(!((PlayerMenu)menu).isCanBuild());
+        event.setCancelled(!menu.isCanBuild());
     }
 
     @EventHandler
@@ -75,6 +83,15 @@ public class MenuEventHandler implements Listener {
         if (!StorageMenuManager.getUsingStorageInventory().contains(event.getPlayer().getUniqueId())) return;
         StorageMenuManager.remove((Player) event.getPlayer());
         Bukkit.getPluginManager().callEvent(new StorageMenuCloseEvent(new StorageMenu(event.getInventory()), (Player) event.getPlayer()));
+    }
+    @EventHandler
+    public void onQuit(PlayerQuitEvent event) {
+        if (MenuManager.getPlayerMenuByPlayer(event.getPlayer()) != null) {
+            MenuManager.getPlayerMenuByPlayer(event.getPlayer());
+        }
+
+        MenuManager.removePlayerMenu(event.getPlayer());
+        MenuManager.remove(event.getPlayer());
     }
 
 }

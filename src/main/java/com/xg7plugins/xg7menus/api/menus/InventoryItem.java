@@ -36,9 +36,8 @@ import java.util.stream.Collectors;
 public class InventoryItem {
 
     private final ItemStack itemStack;
-    @Setter(AccessLevel.PROTECTED)
+    @Setter
     private int slot;
-
     public InventoryItem(Material material, String name, List<String> lore, int amount, int slot) {
 
         ItemStack itemStack = new ItemStack(material, amount);
