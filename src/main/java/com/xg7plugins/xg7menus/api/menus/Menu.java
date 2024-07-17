@@ -65,7 +65,6 @@ public class Menu {
      * @param item
      */
     public void updateInventory(InventoryItem item) {
-        items.replaceAll(itemToReplace -> itemToReplace.getSlot() == itemToReplace.getSlot() ? item : itemToReplace);
         inventory.setItem(item.getSlot(), item.getItemStack());
     }
 
