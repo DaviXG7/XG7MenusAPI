@@ -27,7 +27,8 @@ public class MenuEventHandler implements Listener {
             menu = MenuManager.getPlayerMenuByPlayer((Player) event.getWhoClicked());
             if (menu == null) return;
         }
-        if (!(menu instanceof PlayerMenu) && event.getRawSlot() > menu.getInventory().getSize() - 1) {
+        if (event.getClickedInventory() == null) return;
+        if (!(menu instanceof PlayerMenu) && event.getRawSlot() > event.getClickedInventory().getSize() - 1) {
             menu = MenuManager.getPlayerMenuByPlayer((Player) event.getWhoClicked());
         }
         event.setCancelled(true);

@@ -44,6 +44,16 @@ public class PlayerMenu extends Menu {
     }
 
     /**
+     * Updates the player inventory
+     * @param player The player with inventory
+     * @param item The item that will be replaced
+     */
+    @Override
+    public void updateInventory(Player player, InventoryItem item) {
+        player.getInventory().setItem(item.getSlot(), item.getItemStack());
+    }
+
+    /**
      * Gives the menu items to the player <br>
      * and start the interaction
      * @param player Player who will receive the items.
@@ -62,7 +72,6 @@ public class PlayerMenu extends Menu {
             player.getInventory().setItem(item.getSlot(), item.getItemStack());
         }
 
-        this.inventory = player.getInventory();
     }
 
     /**

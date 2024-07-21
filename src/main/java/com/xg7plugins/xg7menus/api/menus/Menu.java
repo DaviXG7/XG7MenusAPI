@@ -28,11 +28,11 @@ public class Menu {
     private String id;
     @Getter
     private List<InventoryItem> items;
-    @Getter
-    protected Inventory inventory;
     @Setter
     private InventoryItem fillItem = null;
 
+    @Getter
+    @Setter
     private String title;
     private int size;
 
@@ -64,8 +64,8 @@ public class Menu {
      * with inventoryItem itemStack
      * @param item
      */
-    public void updateInventory(InventoryItem item) {
-        inventory.setItem(item.getSlot(), item.getItemStack());
+    public void updateInventory(Player player, InventoryItem item) {
+        player.getOpenInventory().setItem(item.getSlot(), item.getItemStack());
     }
 
     public InventoryItem getItemBySlot(int slot) {
@@ -105,10 +105,7 @@ public class Menu {
      * @param player Player who will open the inventory
      */
     public void open(Player player) {
-
-        this.title = Text.setPlaceholders(title, player);
-
-        inventory = Bukkit.createInventory(player, size, title);
+        Inventory inventory = Bukkit.createInventory(player, size, Text.setPlaceholders(title, player));
         if (fillItem != null) IntStream.range(0, inventory.getSize()).forEach(i -> inventory.setItem(i, fillItem.getItemStack()));
 
         for (InventoryItem item : items) {
@@ -155,6 +152,9 @@ public class Menu {
         }
         public int toSlot() {
             return 9 * y - (9 - x) - 1;
+        }
+        public static InventoryCoordinate fromList(List<Integer> list) {
+            return new InventoryCoordinate(list.get(0), list.get(1));
         }
     }
 

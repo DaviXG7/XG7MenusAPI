@@ -14,6 +14,7 @@ import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
@@ -49,6 +50,19 @@ public class InventoryItem {
         itemStack.setItemMeta(meta);
 
         this.itemStack = itemStack;
+        this.slot = slot;
+    }
+    public InventoryItem(ItemStack stack, String name, List<String> lore, int amount, int slot) {
+
+        ItemMeta meta = stack.getItemMeta();
+        meta.setDisplayName(name);
+        meta.setLore(lore);
+
+        stack.setItemMeta(meta);
+
+        stack.setAmount(amount);
+
+        this.itemStack = stack;
         this.slot = slot;
     }
 
@@ -112,6 +126,49 @@ public class InventoryItem {
         meta.setDisplayName(Text.setPlaceholders(meta.getDisplayName(), player));
         if (meta.getLore() != null) meta.setLore(meta.getLore().stream().map(l -> Text.setPlaceholders(l, player)).collect(Collectors.toList()));
         setMeta(meta);
+    }
+
+    /**
+     * Adds item flags to the item
+     * @param flags the flags of the item
+     * @return this
+     */
+    public InventoryItem addFlags(ItemFlag... flags) {
+        ItemMeta meta = this.itemStack.getItemMeta();
+        meta.addItemFlags(flags);
+        setMeta(meta);
+        return this;
+    }
+
+    /**
+     * Adds a custom model data to item <br>
+     * (Works +1.9)
+     * @param data the data of the model
+     * @return this
+     */
+    public InventoryItem setCustomModelData(int data) {
+        ItemMeta meta = this.itemStack.getItemMeta();
+        meta.setCustomModelData(data);
+        setMeta(meta);
+        return this;
+    }
+
+    /**
+     * Sets the item unbreakable
+     * @param unbreakable if the item is being unbreakable
+     * @return this
+     */
+    @SneakyThrows
+    public InventoryItem setUnbreakable(boolean unbreakable) {
+        ItemMeta meta = this.itemStack.getItemMeta();
+        try {
+            meta.setUnbreakable(unbreakable);
+        } catch (Exception ignored) {
+            Object spigot = meta.getClass().getMethod("spigot").invoke(meta);
+            spigot.getClass().getMethod("setUnbreakable", Boolean.class).invoke(spigot, unbreakable);
+        }
+        setMeta(meta);
+        return this;
     }
 
     /**

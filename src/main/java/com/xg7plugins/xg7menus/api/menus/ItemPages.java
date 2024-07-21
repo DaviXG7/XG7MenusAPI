@@ -59,7 +59,7 @@ public class ItemPages extends Menu {
         super.open(player);
     }
 
-    public void goPage(int pageindex) {
+    public void goPage(Player player, int pageindex) {
         this.pageindex = pageindex;
 
         int index = area * pageindex;
@@ -74,7 +74,7 @@ public class ItemPages extends Menu {
                 if (index == pageItems.size()) break loop;
                 InventoryItem inventoryItem = pageItems.get(index);
                 inventoryItem.setSlot(InventoryCoordinate.toSlot(x,y));
-                updateInventory(inventoryItem);
+                updateInventory(player, inventoryItem);
                 index++;
 
             }
@@ -82,7 +82,7 @@ public class ItemPages extends Menu {
 
     }
 
-    public void nextPage() {
+    public void nextPage(Player player) {
 
         int index = area * (pageindex + 1);
 
@@ -98,14 +98,14 @@ public class ItemPages extends Menu {
                 InventoryItem inventoryItem = new InventoryItem(new ItemStack(Material.AIR), -1);
                 if (index < pageItems.size()) inventoryItem = pageItems.get(index);
                 inventoryItem.setSlot(InventoryCoordinate.toSlot(x,y));
-                updateInventory(inventoryItem);
+                updateInventory(player, inventoryItem);
                 index++;
 
             }
         }
 
     }
-    public void previusPage() {
+    public void previusPage(Player player) {
         if (pageindex -1 < 0) return;
         pageindex--;
 
@@ -121,7 +121,7 @@ public class ItemPages extends Menu {
                 if (index == pageItems.size()) break loop;
                 InventoryItem inventoryItem = pageItems.get(index);
                 inventoryItem.setSlot(InventoryCoordinate.toSlot(x,y));
-                updateInventory(inventoryItem);
+                updateInventory(player, inventoryItem);
                 index++;
 
             }

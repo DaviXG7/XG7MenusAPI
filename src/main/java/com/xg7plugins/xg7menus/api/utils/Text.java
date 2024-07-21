@@ -1,8 +1,11 @@
 package com.xg7plugins.xg7menus.api.utils;
 
 import lombok.Getter;
+import lombok.Setter;
 import lombok.SneakyThrows;
 import me.clip.placeholderapi.PlaceholderAPI;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -14,30 +17,17 @@ import java.util.regex.Pattern;
 
 public class Text {
 
-    /**
-     * The pattern of a hex color or gradient in text <br>
-     * Hex pattern: "&#FFFFFFText" <br>
-     * Gradient pattern: "[g#FFFFFF]Text[/g#000000]"
-     */
     private static final Pattern GRADIENT_PATTERN = Pattern.compile("\\[g#([0-9a-fA-F]{6})](.*?)\\[/g#([0-9a-fA-F]{6})]");
     private final static Pattern HEX_PATTERN = Pattern.compile("&#([A-Fa-f0-9]{6})");
 
-    /**
-     * Sends a message to a {@code CommandSender} <br>
-     * This method helps you send your text in a <br>
-     * formatted and personalized way.
-     *
-     * @param text The text that will be sent
-     * @param sender The sender who will recive the text
-     */
     public static void send(String text, CommandSender sender) {
         if (text == null || text.isEmpty()) return;
         if (sender instanceof Player) {
-            if (text.startsWith("ACTION: ")) {
-                sendActionBar(text.substring(7), ((Player) sender));
+            text = text.replace("[PLAYER]", sender.getName());
+            if (text.startsWith("[ACTION] ")) {
+                sendActionBar(text.substring(9), ((Player) sender));
                 return;
             }
-            if (text.startsWith("CENTER: ")) text = getCentralizedText(PixelsSize.CHAT.getPixels(), text);
 
             sender.sendMessage(getFormatedText(((Player) sender), text));
             return;
@@ -45,15 +35,12 @@ public class Text {
         sender.sendMessage(translateColorCodes(text));
     }
 
-    /**
-     * Sends an ActionBar text <br>
-     * This method makes it simpler to send an action bar
-     *
-     * @param text The text that will be sent
-     * @param player The player who will recive the text
-     */
     @SneakyThrows
     public static void sendActionBar(String text, Player player) {
+        if (Integer.parseInt(Bukkit.getServer().getVersion().split("\\.")[1].replace(")", "")) >= 9) {
+            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(getFormatedText(player, text)));
+            return;
+        }
 
         Class<?> craftPlayerClass = NMSUtil.getCraftBukkitClass("entity.CraftPlayer");
         Object craftPlayer = craftPlayerClass.cast(player);
@@ -72,31 +59,23 @@ public class Text {
 
     }
 
-    /**
-     * Sets the placeholders and translate color codes
-     */
     public static String getFormatedText(Player player, String text) {
+        if (text.startsWith("[CENTER] ")) return translateColorCodes(getCentralizedText(PixelsSize.CHAT.getPixels(), setPlaceholders(text.substring(9), player)));
         return translateColorCodes(setPlaceholders(text, player));
     }
     public static String setPlaceholders(String text, Player player) {
         return Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null ? PlaceholderAPI.setPlaceholders(player, text) : text;
     }
 
-    /**
-     * Translate the color codes on text. Gradient, Hex color and Minecraft color codes <br>
-     * (Gradients and hex colors only in 1.16+)
-     * @param text The text that will be translated
-     * @return The text translated
-     */
     public static String translateColorCodes(String text) {
 
-        if (Integer.parseInt(Bukkit.getServer().getVersion().split("\\.")[1]) >= 16) {
+        if (Integer.parseInt(Bukkit.getServer().getVersion().split("\\.")[1].replace(")", "")) >= 16) {
             text = applyGradients(text);
             Matcher matcher = HEX_PATTERN.matcher(text);
             while (matcher.find()) {
-                String color = text.substring(matcher.start() + 1, matcher.end());
-                text = text.replace(color, net.md_5.bungee.api.ChatColor.of(color) + "");
-                text = new StringBuilder(text).deleteCharAt(matcher.start()).toString();
+                String color = text.substring(matcher.start(), matcher.end());
+                text = text.replace(color, net.md_5.bungee.api.ChatColor.of(color.substring(1)) + "");
+                matcher = HEX_PATTERN.matcher(text);
             }
         }
 
@@ -104,12 +83,6 @@ public class Text {
 
     }
 
-    /**
-     * This method centers the text according to the width in pixels
-     * @param pixels The width in pixels that will be used as a base (Chat: 157; Inventory title: 75; MOTD 127)
-     * @param text The text that will be centered
-     * @return The text centred
-     */
     public static String getCentralizedText(int pixels, String text) {
 
         int textWidht = 0;
@@ -175,10 +148,6 @@ public class Text {
         return builder + text;
 
     }
-
-    /**
-     * Method used to make a gradient text
-     */
     private static double[] linear(double from, double to, int max) {
         final double[] res = new double[max];
         for (int i = 0; i < max; i++) {
@@ -187,11 +156,6 @@ public class Text {
         return res;
     }
 
-    /**
-     * Applies a gradient on a text
-     * @param text The text that will be translated with gradients
-     * @return The text with gradients
-     */
     public static String applyGradients(String text) {
 
         Matcher matcher = GRADIENT_PATTERN.matcher(text);
@@ -221,10 +185,6 @@ public class Text {
 
         return result.toString();
     }
-
-    /**
-     * Get char size in Minecraft font to center the text
-     */
     private static int getCharSize(char c, boolean isBold) {
         String[] chars = new String[]{"~@", "1234567890ABCDEFGHJKLMNOPQRSTUVWXYZabcedjhmnopqrsuvxwyz/\\+=-_^?&%$#", "{}fk*\"<>()", "It[] ", "'l`", "!|:;,.i", "¨´"};
         for (int i = 0; i < chars.length; i++) {
@@ -236,11 +196,38 @@ public class Text {
         return 4;
     }
 
-    /**
-     * This class is used to name the width of texts when centering as an enum
-     */
+    public static long convertToMilliseconds(String timeStr) {
+        long milliseconds = 0;
+        Pattern pattern = Pattern.compile("(\\d+)([SMHD])");
+        Matcher matcher = pattern.matcher(timeStr.toUpperCase());
+
+        while (matcher.find()) {
+            long value = Long.parseLong(matcher.group(1));
+            String unit = matcher.group(2);
+
+            switch (unit) {
+                case "S":
+                    milliseconds += value * 1000;
+                    break;
+                case "M":
+                    milliseconds += value * 60000;
+                    break;
+                case "H":
+                    milliseconds += value * 3600000;
+                    break;
+                case "D":
+                    milliseconds += value * 86400000;
+                    break;
+                default:
+                    Log.severe("Invalid time unit: " + unit);
+            }
+        }
+
+        return milliseconds;
+    }
+
     @Getter
-    enum PixelsSize {
+    public enum PixelsSize {
 
         CHAT(157),
         MOTD(127),
