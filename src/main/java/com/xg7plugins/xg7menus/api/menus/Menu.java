@@ -1,127 +1,116 @@
 package com.xg7plugins.xg7menus.api.menus;
 
-import com.xg7plugins.xg7menus.api.manager.MenuManager;
-import com.xg7plugins.xg7menus.api.utils.Log;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.TypeAdapter;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
+import com.xg7plugins.xg7menus.api.items.Button;
+import com.xg7plugins.xg7menus.api.items.Item;
 import com.xg7plugins.xg7menus.api.utils.Text;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.SneakyThrows;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.IntStream;
+import java.util.*;
 
-/**
- * This is the main class of a menu, where you can <br>
- * create menus in a much simpler way, add items<br>
- * easily, and update the inventory whenever you want.
- * @see MenuManager
- */
-public class Menu {
+@Getter
+public class Menu implements InventoryHolder {
 
-    @Getter
-    private String id;
-    @Getter
-    private List<InventoryItem> items;
-    @Setter
-    private InventoryItem fillItem = null;
-
-    @Getter
-    @Setter
     private String title;
+    private String id;
+    private Button clickListener;
     private int size;
-
-    /**
-     * Menu contructor
-     * @param id The id of the menu
-     * @param title The title of the inventory
-     * @param size The size of the inventory
-     */
-    public Menu(String id, String title, int size) {
+    private List<Item> items;
+    private MenuListener menuListener;
+    private boolean cancelInteraction = true;
+    public Menu(String id, int size, String title) {
         this.id = id;
-        this.title = title;
         this.size = size;
+        this.title = title;
         this.items = new ArrayList<>();
-        Log.fine("Menu with id " + id + " has been created");
     }
-
-    /**
-     * This method add an item to the inventory
-     * @param items Items that will be aded
-     */
-    public void addItems(InventoryItem... items) {
-        Collections.addAll(this.items, items);
+    public Menu(String id, int size, String title, List<Item> items) {
+        this.id = id;
+        this.size = size;
+        this.title = title;
+        this.items = items;
     }
-
-    /**
-     * This method update the list and the player <br>
-     * inventory, replacing the item in inventoryItem slot <br>
-     * with inventoryItem itemStack
-     * @param item
-     */
-    public void updateInventory(Player player, InventoryItem item) {
-        player.getOpenInventory().setItem(item.getSlot(), item.getItemStack());
+    public Menu setClickListener(Button button) {
+        this.clickListener = button;
+        return this;
     }
-
-    public InventoryItem getItemBySlot(int slot) {
-        return items.stream().filter(item -> item.getSlot() == slot).findFirst().orElse(null);
+    public Menu setItem(Item item) {
+        this.items.removeIf(item1 -> item1.getSlot() == item.getSlot());
+        this.items.add(item);
+        return this;
     }
-
-    /**
-     * Makes a solid rectangle of items in the inventory
-     * @param initialCoord First coordinate of the rectangle
-     * @param finalCoord Second coordinate of the rectangle
-     * @param item The item that will fill the rectangle
-     */
-    public void solidRectangle(InventoryCoordinate initialCoord, InventoryCoordinate finalCoord, InventoryItem item) {
-        for (int y = initialCoord.getY(); y <= finalCoord.getY(); y++) for (int x = initialCoord.getX(); x <= finalCoord.getX(); x++) this.addItems(new InventoryItem(item.getItemStack(), InventoryCoordinate.toSlot(x,y)));
+    public static Menu newMenu(String id, int size, String title) {
+        return new Menu(id,size,title);
     }
-
-    /**
-     * Makes an empty rectangle with border of items in the inventory
-     * @param initialCoord First coordinate of the rectangle
-     * @param finalCoord Second coordinate of the rectangle
-     * @param item The item that will br the border of the rectangle
-     */
-    public void borderRectangle(InventoryCoordinate initialCoord, InventoryCoordinate finalCoord, InventoryItem item) {
+    public Menu setCancelInteraction(boolean cancelInteraction) {
+        this.cancelInteraction = cancelInteraction;
+        return this;
+    }
+    public Menu addItems(Item... item) {
+        items.addAll(Arrays.asList(item));
+        return this;
+    }
+    public Menu addItems(List<Item> items) {
+        items.addAll(items);
+        return this;
+    }
+    public Menu solidRectangle(InventoryCoordinate initialCoord, InventoryCoordinate finalCoord, Item item) {
+        for (int y = initialCoord.getY(); y <= finalCoord.getY(); y++) for (int x = initialCoord.getX(); x <= finalCoord.getX(); x++) this.items.add(item.setSlot(InventoryCoordinate.toSlot(x,y)).clone());
+        return this;
+    }
+    public Menu borderRectangle(InventoryCoordinate initialCoord, InventoryCoordinate finalCoord, Item item) {
         for (int x = initialCoord.getX(); x <= finalCoord.getX(); x++) {
-            this.addItems(new InventoryItem(item.getItemStack(), InventoryCoordinate.toSlot(x, initialCoord.getY())));
-            this.addItems(new InventoryItem(item.getItemStack(), InventoryCoordinate.toSlot(x, finalCoord.getY())));
+            this.items.add(item.setSlot(InventoryCoordinate.toSlot(x, initialCoord.getY())).clone());
+            this.items.add(item.setSlot(InventoryCoordinate.toSlot(x, finalCoord.getY())).clone());
         }
         for (int y = initialCoord.getY() + 1; y < finalCoord.getY();  y++) {
-            this.addItems(new InventoryItem(item.getItemStack(), InventoryCoordinate.toSlot(initialCoord.getX(), y)));
-            this.addItems(new InventoryItem(item.getItemStack(), InventoryCoordinate.toSlot(finalCoord.getX(), y)));
+            this.items.add(item.setSlot(InventoryCoordinate.toSlot(initialCoord.getX(), y)).clone());
+            this.items.add(item.setSlot(InventoryCoordinate.toSlot(finalCoord.getX(), y)).clone());
         }
+        return this;
+    }
+    public Menu addOpenAndCloseListener(MenuListener listener) {
+        menuListener = listener;
+        return this;
+    }
+    public void updateInventory(Player player, Item item) {
+        if (player.getOpenInventory().getTopInventory().getHolder() != this) return;
+        player.getOpenInventory().getTopInventory().setItem(item.getSlot(), item.getItemStack());
     }
 
-    /**
-     * Creates the inventory with stored items <br>
-     * and open to a player
-     * @param player Player who will open the inventory
-     */
     public void open(Player player) {
-        Inventory inventory = Bukkit.createInventory(player, size, Text.setPlaceholders(title, player));
-        if (fillItem != null) IntStream.range(0, inventory.getSize()).forEach(i -> inventory.setItem(i, fillItem.getItemStack()));
-
-        for (InventoryItem item : items) {
-            item.setPlaceholders(player);
-            inventory.setItem(item.getSlot(), item.getItemStack());
-        }
-        player.closeInventory();
-        MenuManager.put(player, this);
-        player.openInventory(inventory);
+        player.openInventory(getInventory(player));
     }
-
-    /**
-     * This method closes the player inventory
-     */
     public void close(Player player) {
         player.closeInventory();
+    }
+
+    @NotNull
+    @Override
+    public Inventory getInventory() {
+
+        Inventory inventory = Bukkit.createInventory(this, size, Text.translateColorCodes(title));
+
+        this.items.forEach(item -> inventory.setItem(item.getSlot(), item.getItemStack()));
+
+        return inventory;
+    }
+    public Inventory getInventory(Player player) {
+        Inventory inventory = Bukkit.createInventory(this, size, Text.getFormatedText(player,title));
+
+        this.items.forEach(item -> inventory.setItem(item.getSlot(), item.setPlaceHolders(player).getItemStack()));
+
+        return inventory;
     }
 
     /**
@@ -153,14 +142,33 @@ public class Menu {
         public int toSlot() {
             return 9 * y - (9 - x) - 1;
         }
-        public static InventoryCoordinate fromList(List<Integer> list) {
-            return new InventoryCoordinate(list.get(0), list.get(1));
+        public static Menu.InventoryCoordinate fromList(List<Integer> list) {
+            return new Menu.InventoryCoordinate(list.get(0), list.get(1));
         }
     }
 
+    @Override
+    public String toString() {
+        Gson gson = new GsonBuilder().registerTypeAdapter(Item.class, new ItemAdapter()).create();
+        return gson.toJson(this);
+    }
+    public static Menu fromString(String json) {
+        Gson gson = new GsonBuilder().registerTypeAdapter(Item.class, new ItemAdapter()).create();
+        return gson.fromJson(json, Menu.class);
+    }
 
+    private static class ItemAdapter extends TypeAdapter<Item> {
 
+        @SneakyThrows
+        @Override
+        public void write(JsonWriter out, Item value) {
+            out.value(value.toString());
+        }
 
-
-
+        @SneakyThrows
+        @Override
+        public Item read(JsonReader in)  {
+            return Item.fromString(in.nextString());
+        }
+    }
 }

@@ -2,9 +2,9 @@ package com.xg7plugins.xg7menus.api.menus;
 
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 
 /**
@@ -17,17 +17,17 @@ public class MenuPages {
     /**
      * The menus with ids
      */
-    private final Map<String, Menu> menus = new HashMap<>();
+    private final List<Menu> menus = new ArrayList<>();
 
     public MenuPages(Menu... pages) {
-        Arrays.stream(pages).forEach(menu -> menus.put(menu.getId(), menu));
+        menus.addAll(Arrays.asList(pages));
     }
 
     public Menu getMenu(String id) {
-        return menus.get(id);
+        return menus.stream().filter(menu -> menu.getId().equals(id)).findFirst().orElse(null);
     }
     public void openMenu(String id, Player player) {
-        menus.get(id).open(player);
+        getMenu(id).open(player);
     }
 
 }

@@ -1,10 +1,9 @@
 package com.xg7plugins.xg7menus.api;
 
-import com.xg7plugins.xg7menus.api.events.MenuEventHandler;
-import com.xg7plugins.xg7menus.api.manager.MenuManager;
 import com.xg7plugins.xg7menus.api.utils.Log;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class XG7Menus {
@@ -23,14 +22,7 @@ public class XG7Menus {
         Bukkit.getConsoleSender().sendMessage("It's a free api, visit our website https://xg7plugins.com");
     }
     public static void disable() {
-        Bukkit.getOnlinePlayers().forEach(p -> {
-            if (MenuManager.getPlayerMenuByPlayer(p) != null) {
-                MenuManager.getPlayerMenuByPlayer(p);
-            }
-
-            MenuManager.removePlayerMenu(p);
-            MenuManager.remove(p);
-        });
+        Bukkit.getOnlinePlayers().forEach(HumanEntity::closeInventory);
     }
 
 }
