@@ -49,6 +49,10 @@ public class Item implements Cloneable {
         this.itemStack = itemStack;
         return this;
     }
+    public Item setAmount(int amount) {
+        this.itemStack.setAmount(amount);
+        return this;
+    }
     public Item setSlot(int slot) {
         this.slot = slot;
         return this;
@@ -91,6 +95,7 @@ public class Item implements Cloneable {
         return this;
     }
     public Item setCustomModelData(int data) {
+        if (Integer.parseInt(Bukkit.getServer().getVersion().split("\\.")[1].replace(")", "")) < 9) return this;
         ItemMeta meta = this.itemStack.getItemMeta();
         meta.setCustomModelData(data);
         meta(meta);

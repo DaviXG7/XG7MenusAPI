@@ -23,6 +23,10 @@ public class MenuPages {
         menus.addAll(Arrays.asList(pages));
     }
 
+    public MenuPages addPages(Menu... pages) {
+        menus.addAll(Arrays.asList(pages));
+        return this;
+    }
     public Menu getMenu(String id) {
         return menus.stream().filter(menu -> menu.getId().equals(id)).findFirst().orElse(null);
     }

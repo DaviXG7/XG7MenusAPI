@@ -5,6 +5,7 @@ import com.google.gson.JsonParser;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.xg7plugins.xg7menus.api.utils.Log;
+import com.xg7plugins.xg7menus.api.utils.XSeries.XMaterial;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -20,10 +21,10 @@ import java.util.UUID;
 
 public class SkullItem extends Item {
     public SkullItem(int slot, int amount) {
-        super(slot, Material.matchMaterial("PLAYER_HEAD") != null ? new ItemStack(Material.getMaterial("PLAYER_HEAD"), amount) : new MaterialData(Material.getMaterial("SKULL_ITEM"), (byte) 3).toItemStack(amount),  null);
+        super(slot, XMaterial.PLAYER_HEAD.parseItem(amount),  null);
     }
     public SkullItem(int slot, int amount, Button button) {
-        super(slot, Material.matchMaterial("PLAYER_HEAD") != null ? new ItemStack(Material.getMaterial("PLAYER_HEAD"), amount) : new MaterialData(Material.getMaterial("SKULL_ITEM"), (byte) 3).toItemStack(amount),  button);
+        super(slot, XMaterial.PLAYER_HEAD.parseItem(amount),  button);
     }
     public static SkullItem newSkullItem(int slot, int amount) {
         return new SkullItem(slot, amount);
@@ -38,7 +39,6 @@ public class SkullItem extends Item {
      * @return This InventoryItem
      */
     public SkullItem setValue(String value) {
-        if (Integer.parseInt(Bukkit.getServer().getVersion().split("\\.")[1].replace(")", "")) <= 7) return this;
         GameProfile gameProfile = new GameProfile(UUID.randomUUID(), "null");
         gameProfile.getProperties().put("textures", new Property("textures", value));
 
@@ -63,7 +63,6 @@ public class SkullItem extends Item {
     public SkullItem setOwner(String owner) {
         if (Integer.parseInt(Bukkit.getServer().getVersion().split("\\.")[1].replace(")", "")) <= 7) return this;
         ((SkullMeta) this.itemStack.getItemMeta()).setOwner(owner);
-        if (Bukkit.getOnlineMode()) setPlayerSkinValue(Bukkit.getOfflinePlayer(owner).getUniqueId());
         return this;
     }
 
@@ -73,7 +72,6 @@ public class SkullItem extends Item {
      * @return This InventoryItem
      */
     public SkullItem setPlayerSkinValue(UUID player) {
-        if (Integer.parseInt(Bukkit.getServer().getVersion().split("\\.")[1].replace(")", "")) <= 7) return this;
         try {
             URL url = new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + player);
 
