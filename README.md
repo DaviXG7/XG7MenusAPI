@@ -22,7 +22,7 @@ To start using XG7Menus in your Spigot plugin, follow these steps:
 <dependency>
   <groupId>com.github.DaviXG7</groupId>
   <artifactId>XG7MenusAPI</artifactId>
-  <version>Beta-1.2</version>
+  <version>BETA-1.3</version>
 </dependency>
 ```
 2. **Include it in your main file**:
@@ -33,56 +33,27 @@ XG7Menus.inicialize(this);
 3. **Create a Menu**:
    - Define menu layouts using intuitive methods provided by XG7Menus.
    - Populate menus with items using simple item management APIs.
-4. **Handle the menu with click event**:
-   - XG7Menus has a custom click event, here is an example:
-```java
-@EventHandler
-public void onClick(MenuClickEvent event) {
-   if (!event.getMenu().getId().equals("yourid")) return;
-   if (event.getSlot() == 0) {
-      event.getMenu().updateInventory(
-         new InventoryItem(
-         Material.DIAMOND,
-         "Changed item on slot 0",
-         new ArrayList<>(),
-         1, 
-         //Will change the item with this slot
-         0
-         )
-      );
-      //Other methods
-      event.getPlayer();
-      //If menu is a PlayerMenu
-      event.getLocation();
-      event.getInventoryItem();
-      //Menu click type
-      event.getType();
-   }
-}
-```
 #### Example Usage
 ```java
-//Create the menu
-Menu menu = new Menu("id of the menu", "Title of the menu", /* size of the menu */ 27);
-//Add the items
-menu.addItems(
-  new InventoryItem(Material.DIAMOND, "name of the item", Collections.singletonList("Lore of the item"), /* amount */ 1, /* slot */ 0)
-);
-//Open the menu
-menu.open(player);
-```
-#### Other menus
-```java
-//Create the menu
-Menu menu = new Menu("id of the menu", "Title of the menu", /* size of the menu */ 27);
-//Create a player inventory menu
-PlayerMenu playerMenu = new PlayerMenu("id of the menu");
-//Create a simple menu pages
-MenuPages pages = new MenuPages(menu1, menu2, ...);
-//Create a list of item pages
-ItemPages itemPages = new ItemPages("id", "title", /* size */27, items, new Menu.InventoryCoordinate(1,1), new Menu.InventoryCoordinate(9,5));
-//Create a StorageMenu to Storage items in a json or database
-StorageMenu storageMenu = new StorageMenu(/* Inicializes with empty inventory or a map with items or an inventory */);
+Menu.newMenu("id", 27 /* size */, "title")
+                .addItems(
+                        Item.newItem(new ItemStack(Material.DIAMOND), 1 /* slot */)
+                                .click(
+                                        Button.click(inventoryClickEvent -> {
+                                            inventoryClickEvent.getWhoClicked().sendMessage("Click listener");
+                                            Menu menuOfEvent = (Menu) inventoryClickEvent.getClickedInventory().getHolder();
+                                            menuOfEvent.updateInventory((Player) inventoryClickEvent.getWhoClicked(), Item.fromItemStack(inventoryClickEvent.getCurrentItem()).name("New name"));
+                                        }
+                                    )
+                                )
+                                .name("Item name")
+                        
+                )
+                .addOpenAndCloseListener(MenuListener.create( 
+                        open -> System.out.println("menu opened"),
+                        close -> System.out.println("Menu closed")
+                )
+                        ).open(player);
 ```
 
 #### InventoryCoordinate Showcase
