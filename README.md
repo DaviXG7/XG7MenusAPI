@@ -42,7 +42,7 @@ Menu.newMenu("id", 27 /* size */, "title")
                                         Button.click(inventoryClickEvent -> {
                                             inventoryClickEvent.getWhoClicked().sendMessage("Click listener");
                                             Menu menuOfEvent = (Menu) inventoryClickEvent.getClickedInventory().getHolder();
-                                            menuOfEvent.updateInventory((Player) inventoryClickEvent.getWhoClicked(), Item.fromItemStack(inventoryClickEvent.getCurrentItem()).name("New name"));
+                                            menuOfEvent.updateInventory((Player) inventoryClickEvent.getWhoClicked(), Item.fromItemStack(inventoryClickEvent.getCurrentItem()).name("New name").setSlot(inventoryClickEvent.getSlot()));
                                         }
                                     )
                                 )
