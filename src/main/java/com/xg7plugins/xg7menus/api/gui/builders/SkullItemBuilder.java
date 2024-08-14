@@ -1,16 +1,15 @@
-package com.xg7plugins.xg7menus.api.items;
+package com.xg7plugins.xg7menus.api.gui.builders;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
+import com.xg7plugins.xg7menus.api.gui.MenuItem;
+import com.xg7plugins.xg7menus.api.gui.events.ClickEvent;
 import com.xg7plugins.xg7menus.api.utils.Log;
 import com.xg7plugins.xg7menus.api.utils.XSeries.XMaterial;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.bukkit.material.MaterialData;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -18,27 +17,40 @@ import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.UUID;
+import java.util.function.Consumer;
 
-public class SkullItem extends Item {
-    public SkullItem(int slot, int amount) {
-        super(slot, XMaterial.PLAYER_HEAD.parseItem(amount),  null);
+public class SkullItemBuilder extends ItemBuilder {
+
+    private boolean renderPlayerSkullOnOpen = false;
+
+    public SkullItemBuilder() {
+        super(XMaterial.PLAYER_HEAD.parseItem());
     }
-    public SkullItem(int slot, int amount, Button button) {
-        super(slot, XMaterial.PLAYER_HEAD.parseItem(amount),  button);
+
+    public void renderPlayerSkullOnOpen(boolean renderPlayerSkullOnOpen) {
+        this.renderPlayerSkullOnOpen = renderPlayerSkullOnOpen;
     }
-    public static SkullItem newSkullItem(int slot, int amount) {
-        return new SkullItem(slot, amount);
+
+    @Override
+    public MenuItem asMenuItem() {
+        MenuItem menuItem = new MenuItem(this.itemStack);
+        menuItem.setRenderIfSkull(renderPlayerSkullOnOpen);
+        return menuItem;
     }
-    public static SkullItem newSkullItem(int slot, int amount, Button button) {
-        return new SkullItem(slot, amount,button);
+    public MenuItem asMenuItem(Consumer<ClickEvent> event) {
+        this.event = event;
+        MenuItem menuItem = new MenuItem(this.itemStack);
+        menuItem.setRenderIfSkull(renderPlayerSkullOnOpen);
+        return menuItem;
     }
+
 
     /**
      * This method sets the skull skin value
      * @param value The skin value of the skull
      * @return This InventoryItem
      */
-    public SkullItem setValue(String value) {
+    public SkullItemBuilder setValue(String value) {
         GameProfile gameProfile = new GameProfile(UUID.randomUUID(), "null");
         gameProfile.getProperties().put("textures", new Property("textures", value));
 
@@ -60,7 +72,7 @@ public class SkullItem extends Item {
      * @param owner The skin owner of the skull
      * @return This InventoryItem
      */
-    public SkullItem setOwner(String owner) {
+    public SkullItemBuilder setOwner(String owner) {
         if (Integer.parseInt(Bukkit.getServer().getVersion().split("\\.")[1].replace(")", "")) <= 7) return this;
         ((SkullMeta) this.itemStack.getItemMeta()).setOwner(owner);
         return this;
@@ -71,7 +83,7 @@ public class SkullItem extends Item {
      * @param player The player that will be used to get the skin value
      * @return This InventoryItem
      */
-    public SkullItem setPlayerSkinValue(UUID player) {
+    public SkullItemBuilder setPlayerSkinValue(UUID player) {
         try {
             URL url = new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + player);
 

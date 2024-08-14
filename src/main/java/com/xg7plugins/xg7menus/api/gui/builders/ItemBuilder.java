@@ -1,100 +1,90 @@
-package com.xg7plugins.xg7menus.api.items;
+package com.xg7plugins.xg7menus.api.gui.builders;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.xg7plugins.xg7menus.api.gui.events.ClickEvent;
+import com.xg7plugins.xg7menus.api.gui.MenuItem;
 import com.xg7plugins.xg7menus.api.utils.NMSUtil;
 import com.xg7plugins.xg7menus.api.utils.Text;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.MaterialData;
 
 import java.lang.reflect.Method;
-import java.util.Base64;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-@Getter
-@AllArgsConstructor
-public class Item implements Cloneable {
-
-    private int slot;
+public class ItemBuilder {
     protected ItemStack itemStack;
-    private Button button;
+    @Getter
+    protected Consumer<ClickEvent> event;
 
-    public static Item newItem(ItemStack stack, int slot, Button button) {
-        return new Item(slot,stack, button);
+    public ItemBuilder(ItemStack stack) {
+        this.itemStack = stack;
     }
-    public static Item newItem(ItemStack stack, int slot) {
-        return new Item(slot,stack,null);
+    public static ItemBuilder from(Material material) {
+        return new ItemBuilder(new ItemStack(material));
     }
-    public Item click(Button button) {
-        this.button = button;
-        return this;
+    public static ItemBuilder from(MaterialData material) {
+        return new ItemBuilder(material.toItemStack());
     }
-    public Item setItemStack(ItemStack itemStack) {
-        this.itemStack = itemStack;
-        return this;
+    public static ItemBuilder from(ItemStack itemStack) {
+        return new ItemBuilder(itemStack);
     }
-    public Item setAmount(int amount) {
+    public static ItemBuilder from(MenuItem item) {
+        return new ItemBuilder(item.getItemStack());
+    }
+    public ItemBuilder setAmount(int amount) {
         this.itemStack.setAmount(amount);
         return this;
     }
-    public Item setSlot(int slot) {
-        this.slot = slot;
+    public ItemBuilder setItemStack(ItemStack itemStack) {
+        this.itemStack = itemStack;
         return this;
     }
-    public Item data(MaterialData data) {
+    public ItemBuilder data(MaterialData data) {
         this.itemStack.setData(data);
         return this;
     }
-    public Item meta(ItemMeta meta) {
+    public ItemBuilder meta(ItemMeta meta) {
         this.itemStack.setItemMeta(meta);
         return this;
     }
-    public Item addEnchant(Enchantment enchant, int level) {
+    public ItemBuilder addEnchant(Enchantment enchant, int level) {
         this.itemStack.addUnsafeEnchantment(enchant, level);
         return this;
     }
-    public Item addEnchants(Map<Enchantment, Integer> enchants) {
+    public ItemBuilder addEnchants(Map<Enchantment, Integer> enchants) {
         this.itemStack.addUnsafeEnchantments(enchants);
         return this;
     }
-    public Item lore(List<String> lore) {
+    public ItemBuilder lore(List<String> lore) {
         ItemMeta meta = this.itemStack.getItemMeta();
-        meta.setLore(lore.stream().map(Text::translateColorCodes).collect(Collectors.toList()));
+        meta.setLore(lore.stream().map(text -> Text.format(text).getText()).collect(Collectors.toList()));
         meta(meta);
         return this;
     }
-    public Item name(String name) {
+    public ItemBuilder name(String name) {
         ItemMeta meta = this.itemStack.getItemMeta();
-        meta.setDisplayName(Text.translateColorCodes(name));
+        meta.setDisplayName(Text.format(name).getText());
         meta(meta);
         return this;
     }
-    public static Item fromItemStack(ItemStack stack) {
-        return new Item(-1, stack, null);
-    }
-    public Item addFlags(ItemFlag... flags) {
+    public ItemBuilder addFlags(ItemFlag... flags) {
         ItemMeta meta = this.itemStack.getItemMeta();
         meta.addItemFlags(flags);
         meta(meta);
         return this;
     }
-    public Item setCustomModelData(int data) {
+    public ItemBuilder setCustomModelData(int data) {
         if (Integer.parseInt(Bukkit.getServer().getVersion().split("\\.")[1].replace(")", "")) < 9) return this;
         ItemMeta meta = this.itemStack.getItemMeta();
         meta.setCustomModelData(data);
@@ -102,7 +92,7 @@ public class Item implements Cloneable {
         return this;
     }
     @SneakyThrows
-    public Item unbreakable(boolean unbreakable) {
+    public ItemBuilder unbreakable(boolean unbreakable) {
         ItemMeta meta = this.itemStack.getItemMeta();
         try {
             meta.setUnbreakable(unbreakable);
@@ -113,15 +103,14 @@ public class Item implements Cloneable {
         meta(meta);
         return this;
     }
-    public Item setPlaceHolders(Player player) {
+    public ItemBuilder setPlaceHolders(Player player) {
         if (itemStack.getItemMeta() == null) return this;
-        if (itemStack.getItemMeta().getDisplayName() != null) name(Text.setPlaceholders(itemStack.getItemMeta().getDisplayName(), player));
-        if (itemStack.getItemMeta().getLore() != null) lore(itemStack.getItemMeta().getLore().stream().map(l -> Text.setPlaceholders(l,player)).collect(Collectors.toList()));
+        if (itemStack.getItemMeta().getDisplayName() != null) name(Text.format(itemStack.getItemMeta().getDisplayName()).setPlaceholders(player).getText());
+        if (itemStack.getItemMeta().getLore() != null) lore(itemStack.getItemMeta().getLore().stream().map(l -> Text.format(l).setPlaceholders(player).getText()).collect(Collectors.toList()));
         return this;
     }
-
     @SneakyThrows
-    public Item addOrModifyNBTTag(String key, Object value) {
+    public ItemBuilder addOrModifyNBTTag(String key, Object value) {
 
         Gson gson = new Gson();
 
@@ -171,47 +160,23 @@ public class Item implements Cloneable {
         }
         return null;
     }
-
-    @SneakyThrows
-    public static Item fromString(String json) {
-        JsonObject object = new JsonParser().parse(json).getAsJsonObject();
-
-        String item64 = object.get("item").getAsString();
-
-        String yaml = new String(Base64.getDecoder().decode(item64));
-        YamlConfiguration config = new YamlConfiguration();
-        config.loadFromString(yaml);
-
-        return new Item(object.get("slot").getAsInt(), config.getItemStack("item"), null);
+    public ItemStack asItemStack() {
+        return this.itemStack;
     }
-
-
-    @Override
-    public String toString() {
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        YamlConfiguration config = new YamlConfiguration();
-        config.set("item", itemStack);
-        String yaml = config.saveToString();
-
-        Map<String, Object> inventoryItem = new HashMap<>();
-        inventoryItem.put("item", Base64.getEncoder().encodeToString(yaml.getBytes()));
-        inventoryItem.put("slot", slot);
-
-        return gson.toJson(inventoryItem);
+    public MenuItem asMenuItem() {
+        return new MenuItem(this.itemStack);
     }
-    public static Item chose(boolean chose, Item item1, Item item2) {
+    public MenuItem asMenuItem(Consumer<ClickEvent> event) {
+        this.event = event;
+        return new MenuItem(this.itemStack);
+    }
+    public static ItemBuilder chose(boolean chose, ItemBuilder item1, ItemBuilder item2) {
         return chose ? item1 : item2;
     }
-    public static Item choseByNewerVersion(int version, Item item1, Item item2) {
+    public static ItemBuilder choseByNewerVersion(int version, ItemBuilder item1, ItemBuilder item2) {
         return Integer.parseInt(Bukkit.getServer().getVersion().split("\\.")[1].replace(")", "")) > version ? item1 : item2;
     }
-    public static Item choseByOlderVersion(int version, Item item1, Item item2) {
+    public static ItemBuilder choseByOlderVersion(int version, ItemBuilder item1, ItemBuilder item2) {
         return Integer.parseInt(Bukkit.getServer().getVersion().split("\\.")[1].replace(")", "")) < version ? item1 : item2;
-    }
-
-    @SneakyThrows
-    @Override
-    public Item clone() {
-        return (Item) super.clone();
     }
 }
