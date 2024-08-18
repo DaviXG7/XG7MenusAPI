@@ -34,26 +34,10 @@ XG7Menus.inicialize(this);
    - Define menu layouts using intuitive methods provided by XG7Menus.
    - Populate menus with items using simple item management APIs.
 #### Example Usage
+
 ```java
-Menu.newMenu("id", 27 /* size */, "title")
-                .addItems(
-                        Item.newItem(new ItemStack(Material.DIAMOND), 1 /* slot */)
-                                .click(
-                                        Button.click(inventoryClickEvent -> {
-                                            inventoryClickEvent.getWhoClicked().sendMessage("Click listener");
-                                            Menu menuOfEvent = (Menu) inventoryClickEvent.getClickedInventory().getHolder();
-                                            menuOfEvent.updateInventory((Player) inventoryClickEvent.getWhoClicked(), Item.fromItemStack(inventoryClickEvent.getCurrentItem()).name("New name").setSlot(inventoryClickEvent.getSlot()));
-                                        }
-                                    )
-                                )
-                                .name("Item name")
-                        
-                )
-                .addOpenAndCloseListener(MenuListener.create( 
-                        open -> System.out.println("menu opened"),
-                        close -> System.out.println("Menu closed")
-                )
-                        ).open(player);
+import com.xg7plugins.xg7menus.api.menus.builders.menu.MenuBuilder;
+
 ```
 
 #### InventoryCoordinate Showcase

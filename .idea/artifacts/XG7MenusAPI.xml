@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="XG7MenusAPI">
+    <output-path>$PROJECT_DIR$/out/artifacts/XG7MenusAPI</output-path>
+    <root id="archive" name="XG7MenusAPI.jar">
+      <element id="module-output" name="XG7MenusAPI" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/github/ben-manes/caffeine/caffeine/2.8.8/caffeine-2.8.8.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>

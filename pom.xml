@@ -6,7 +6,7 @@
 
     <groupId>com.xg7plugins.xg7menus.api</groupId>
     <artifactId>XG7MenusAPI</artifactId>
-    <version>BETA-1.3</version>
+    <version>BETA-2.0</version>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -53,9 +53,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>dev.triumphteam</groupId>
-            <artifactId>triumph-gui</artifactId>
-            <version>3.1.10</version>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+            <version>2.8.8</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
