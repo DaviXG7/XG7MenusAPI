@@ -28,7 +28,7 @@ public class SkullItemBuilder extends BaseItemBuilder<SkullItemBuilder> {
     public SkullItemBuilder() {
         super(XMaterial.PLAYER_HEAD.parseItem());
     }
-    public static SkullItemBuilder create() {
+    public static SkullItemBuilder builder() {
         return new SkullItemBuilder();
     }
     public SkullItemBuilder renderSkullPlayer() {

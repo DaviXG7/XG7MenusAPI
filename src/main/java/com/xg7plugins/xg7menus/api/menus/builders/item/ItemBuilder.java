@@ -42,4 +42,7 @@ public class ItemBuilder extends BaseItemBuilder<ItemBuilder> {
     public SkullItemBuilder skull() {
         return new SkullItemBuilder();
     }
+    public BookItemBuilder book() {
+        return new BookItemBuilder();
+    }
 }
