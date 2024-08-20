@@ -1,18 +1,16 @@
 package com.xg7plugins.xg7menus.api.menus.builders.item;
 
-import com.xg7plugins.xg7menus.api.XG7Menus;
 import com.xg7plugins.xg7menus.api.menus.MenuException;
 import com.xg7plugins.xg7menus.api.menus.builders.BaseItemBuilder;
+import com.xg7plugins.xg7menus.api.utils.Log;
 import com.xg7plugins.xg7menus.api.utils.NMSUtil;
 import com.xg7plugins.xg7menus.api.utils.Text;
-import com.xg7plugins.xg7menus.api.utils.XSeries.XMaterial;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import lombok.SneakyThrows;
 import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.chat.TextComponentSerializer;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
@@ -20,22 +18,23 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 public class BookItemBuilder extends BaseItemBuilder<BookItemBuilder> {
     public BookItemBuilder() {
-        super(XMaterial.WRITTEN_BOOK.parseItem());
+        super(new ItemStack(Material.WRITTEN_BOOK));
+        title("Blank");
+        author("None");
     }
     public BookItemBuilder(ItemStack book) {
         super(book);
+        title("Blank");
+        author("None");
     }
 
     @Contract("_ -> new")
     public static @NotNull BookItemBuilder from(@NotNull ItemStack book) {
-        if (!book.getType().equals(XMaterial.WRITTEN_BOOK.parseMaterial())) throw new MenuException("This item isn't a writable book!");
+        if (!book.getType().equals(Material.WRITTEN_BOOK)) throw new MenuException("This item isn't a writable book!");
         return new BookItemBuilder(book);
     }
     @Contract(" -> new")
@@ -67,7 +66,12 @@ public class BookItemBuilder extends BaseItemBuilder<BookItemBuilder> {
             meta.spigot().addPage(components);
             super.meta(meta);
             return this;
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+            if (Integer.parseInt(Bukkit.getServer().getVersion().split("\\.")[1].replace(")", "")) < 8) {
+                Log.warn("Books with base component is not supported on this version!");
+                return this;
+            }
+        }
 
         return this;
     }
@@ -77,6 +81,11 @@ public class BookItemBuilder extends BaseItemBuilder<BookItemBuilder> {
 
         if (Integer.parseInt(Bukkit.getServer().getVersion().split("\\.")[1].replace(")", "")) > 13) {
             player.openBook(this.itemStack);
+            return;
+        }
+
+        if (Integer.parseInt(Bukkit.getServer().getVersion().split("\\.")[1].replace(")", "")) < 8) {
+            Log.warn("Books is not supported on version under of 1.8!");
             return;
         }
 
