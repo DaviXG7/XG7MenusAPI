@@ -27,7 +27,6 @@ public class Text {
     private String text;
     private ComponentBuilder builder;
 
-    public Text() {}
     public Text(String text) {
         if (Integer.parseInt(Bukkit.getServer().getVersion().split("\\.")[1].replace(")", "")) >= 16) {
             this.text = applyGradients(text);
@@ -65,13 +64,9 @@ public class Text {
     public static @NotNull Text formatAndCenter(String text, PixelsSize size) {
         return new Text(text, size);
     }
-    private void setComponentBuilder() {
-        this.builder = new ComponentBuilder();
-    }
-    public static @NotNull Text componentBuilder() {
-        Text text = new Text();
-        text.setComponentBuilder();
-        return text;
+    public Text componentBuilder() {
+        this.builder = new ComponentBuilder(this.text);
+        return this;
     }
     public Text addHoverEvent(HoverEvent event) {
         this.builder.event(event);
