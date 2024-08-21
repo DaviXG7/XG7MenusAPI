@@ -6,7 +6,7 @@
 
     <groupId>com.xg7plugins.xg7menus.api</groupId>
     <artifactId>XG7MenusAPI</artifactId>
-    <version>BETA-2.0</version>
+    <version>BETA-2.1</version>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -55,18 +55,6 @@
             <groupId>com.mojang</groupId>
             <artifactId>authlib</artifactId>
             <version>1.5.25</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.geysermc.geyser</groupId>
-            <artifactId>api</artifactId>
-            <version>2.4.2-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.geysermc.floodgate</groupId>
-            <artifactId>api</artifactId>
-            <version>2.2.3-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

@@ -17,9 +17,6 @@ import org.bukkit.inventory.meta.BookMeta;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.Constructor;
-import java.util.Arrays;
-
 public class BookItemBuilder extends BaseItemBuilder<BookItemBuilder> {
     public BookItemBuilder() {
         super(new ItemStack(Material.WRITTEN_BOOK));

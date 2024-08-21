@@ -1,7 +1,6 @@
 package com.xg7plugins.xg7menus.api.utils;
 
 import lombok.Getter;
-import lombok.Setter;
 import lombok.SneakyThrows;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.md_5.bungee.api.ChatMessageType;
@@ -25,9 +24,12 @@ public class Text {
     private static final Pattern HEX_PATTERN = Pattern.compile("&#([A-Fa-f0-9]{6})");
 
     private String text;
-    private ComponentBuilder builder;
+    private ComponentBuilder componentBuilder;
 
     public Text(String text) {
+
+        this.componentBuilder = new ComponentBuilder();
+
         if (Integer.parseInt(Bukkit.getServer().getVersion().split("\\.")[1].replace(")", "")) >= 16) {
             this.text = applyGradients(text);
             Matcher matcher = HEX_PATTERN.matcher(text);
@@ -39,8 +41,12 @@ public class Text {
         }
 
         this.text = ChatColor.translateAlternateColorCodes('&', text);
+
     }
     public Text(String text, PixelsSize centerSize) {
+
+        this.componentBuilder = new ComponentBuilder();
+
         if (Integer.parseInt(Bukkit.getServer().getVersion().split("\\.")[1].replace(")", "")) >= 16) {
             this.text = applyGradients(text);
             Matcher matcher = HEX_PATTERN.matcher(text);
@@ -54,6 +60,7 @@ public class Text {
         this.text = ChatColor.translateAlternateColorCodes('&', text);
 
         if (text.startsWith("[CENTER] ")) this.text = getCentralizedText(centerSize.getPixels(), text);
+
     }
 
     @Contract("_ -> new")
@@ -64,41 +71,13 @@ public class Text {
     public static @NotNull Text formatAndCenter(String text, PixelsSize size) {
         return new Text(text, size);
     }
-    public Text componentBuilder() {
-        this.builder = new ComponentBuilder(this.text);
-        return this;
-    }
-    public Text addHoverEvent(HoverEvent event) {
-        this.builder.event(event);
-        return this;
-    }
-    public Text addClickEvent(ClickEvent event) {
-        this.builder.event(event);
-        return this;
-    }
-    public Text appendAndFormat(String text) {
-        this.builder.append(Text.format(text).getText());
-        return this;
-    }
-    public Text appendAndFormatWithPlaceholders(String text, Player player) {
-        this.builder.append(Text.format(text).setPlaceholders(player).getText());
-        return this;
-    }
-    public Text appendAndFormat(BaseComponent component) {
-        this.builder.append(component);
-        return this;
-    }
-    public BaseComponent[] build() {
-        return this.builder.create();
-    }
 
     public void send(CommandSender sender) {
 
-        String finaltext = text;
         if (sender instanceof Player) {
-            finaltext = finaltext.replace("[PLAYER]", sender.getName());
+            text = text.replace("[PLAYER]", sender.getName());
             if (text.startsWith("[ACTION] ")) {
-                finaltext = finaltext.substring(9);
+                text = text.substring(9);
                 sendActionBar(((Player) sender));
                 return;
             }
@@ -115,11 +94,7 @@ public class Text {
     @SneakyThrows
     private void sendActionBar(Player player) {
         if (Integer.parseInt(Bukkit.getServer().getVersion().split("\\.")[1].replace(")", "")) >= 9) {
-            if (this.builder == null) {
-                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(text));
-                return;
-            }
-            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, build());
+            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(text));
             return;
         }
 
