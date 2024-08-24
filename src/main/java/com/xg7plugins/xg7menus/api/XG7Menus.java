@@ -1,5 +1,6 @@
 package com.xg7plugins.xg7menus.api;
 
+import com.xg7plugins.xg7menus.api.menus.builders.menu.MenuBuilder;
 import com.xg7plugins.xg7menus.api.menus.listeners.MenuListener;
 import com.xg7plugins.xg7menus.api.menus.listeners.PlayerMenuListener;
 import com.xg7plugins.xg7menus.api.menus.player.PlayerMenu;
@@ -24,7 +25,6 @@ public class XG7Menus {
         plugin.getServer().getPluginManager().registerEvents(new PlayerMenuListener(), plugin);
         Bukkit.getConsoleSender().sendMessage("[" + plugin.getName() + "] is using XG7MenusAPI.");
         Bukkit.getConsoleSender().sendMessage("It's a free api, visit our website https://xg7plugins.com");
-
     }
     public static void disable() {
         Bukkit.getOnlinePlayers().forEach(HumanEntity::closeInventory);
